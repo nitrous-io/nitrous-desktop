@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+gem 'sass',               '~> 3.2.10'
+gem 'coffee-script',      '~> 2.2.0'
+gem 'handlebars-source',  '~> 1.0.12'
+gem 'ember-source',       '~> 1.0.0'
+gem 'barber-emblem',      '~> 0.1.1'
+gem 'emblem-sprockets',   '~> 0.1.0'
+gem 'sprockets',          '~> 2.10.0'
+gem 'closure-compiler',   '~> 1.1.10'
+gem 'yui-compressor',     '~> 0.12.0'

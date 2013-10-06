@@ -1,4 +1,11 @@
 {
-  "name": "nw-demo",
-  "main": "index.html"
+  "name": "nitrous-desktop"
+, "main": "index.html"
+, "window": {
+    "show": false
+  }
+, "dependencies": {
+  }
+, "devDependencies": {
+  }
 }
