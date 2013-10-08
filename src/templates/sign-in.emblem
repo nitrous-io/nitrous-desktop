@@ -1,0 +1,19 @@
+form
+  fieldset
+    .nitrous-logo
+
+    h1 Nitrous.IO
+
+    .form-group
+      Em.TextField placeholder='Username'
+
+    .form-group
+      Em.TextField type='Password' placeholder='Password'
+
+    .form-group
+      button.native Sign In
+
+    .links
+      a href='#' Forgot your password?
+      .pull-right
+        a href='#' Not a user? Sign up

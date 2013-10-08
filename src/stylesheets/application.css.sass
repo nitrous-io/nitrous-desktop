@@ -1,5 +1,30 @@
+//= require bootstrap3/css/bootstrap
+//= require font-awesome/css/font-awesome
+//= require_self
+//= require osx
+//= require_tree ./views
+
+@import 'variables'
+
+@font-face
+  font-family: 'EurostileLTPro-BoldEx2'
+  src: url('../resources/fonts/2650DC_0_0.eot')
+  src: url('../resources/fonts/2650DC_0_0.eot?#iefix') format('embedded-opentype'), url('../resources/fonts/2650DC_0_0.woff') format('woff'), url('../resources/fonts/2650DC_0_0.ttf') format('truetype')
+
 html
   border-top: 1px solid #6a6a6a
+  overflow: hidden
 
 html.blurred
   border-top: 1px solid #a8a8a8
+
+body
+  position: fixed
+  font-size: 13px
+  -webkit-user-select: none
+
+#debug
+  display: none
+  position: fixed
+  top: 0
+  right: 0

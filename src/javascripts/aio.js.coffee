@@ -8,4 +8,6 @@
 #= require router
 #= require_self
 
+gui = require 'nw.gui'
+
 gui.Window.get().show()

@@ -1,0 +1,26 @@
+{
+  "development": {
+    "app_name": "Nitrous Desktop (development)"
+  , "app_version": "1.0.0"
+  , "host": "https://www.n2odev.com:5000"
+  , "client_id": "2aa25d507f263f954c331c57d04f3e147e39fdaf9c6c4e146d496e99b51ddfd6"
+  , "client_secret": "ac187c7e14fbd91943ba1350c62ec2cd85730ada36614a9f24fa831fc2de0b38"
+  , "pusher_key": "8378c5bfda48f93951e5"
+  }
+, "staging": {
+    "app_name": "Nitrous Desktop (staging)"
+  , "app_version": "1.0.0"
+  , "host": "https://www.n2ostaging.com"
+  , "client_id": ""
+  , "client_secret": ""
+  , "pusher_key": ""
+  }
+, "production": {
+    "app_name": "Nitrous Desktop"
+  , "app_version": "1.0.0"
+  , "host": "https://www.nitrous.io"
+  , "client_id": ""
+  , "client_secret": ""
+  , "pusher_key": ""
+  }
+}

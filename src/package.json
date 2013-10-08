@@ -3,6 +3,9 @@
 , "main": "index.html"
 , "window": {
     "show": false
+  , "toolbar": false
+  , "width": 320
+  , "height": 480
   }
 , "dependencies": {
   }

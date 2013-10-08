@@ -1,0 +1,36 @@
+@import '../variables'
+
+#sign-in-view
+  width: 320px
+  height: 479px
+  padding: 20px 20px 19px 20px
+
+  .nitrous-logo
+    width: 256px
+    height: 256px
+    margin: 0 auto
+    background-image: url('../resources/images/icon_256x256.png')
+    background-size: 256px 256px
+
+  h1
+    font-family: 'EurostileLTPro-BoldEx2'
+    font-size: 30px
+    text-align: center
+    text-transform: uppercase
+    color: #555
+    margin-top: 10px
+    -webkit-font-smoothing: antialiased
+
+  input[type=text], input[type=password]
+    width: 100%
+
+  .links
+    font-size: 12px
+
+  button
+    width: 100%
+
+@media (-webkit-min-device-pixel-ratio: 2)
+  #sign-in-view
+    .nitrous-logo
+      background-image: url('../resources/images/icon_256x256@2x.png')

@@ -1,0 +1,44 @@
+#= require jquery/jquery-2.0.3
+#= require handlebars
+#= require ember
+#= require ember-model/ember-model-0.0.10
+#= require bootstrap3/js/bootstrap
+#= require_self
+#= require aio
+
+gui = require 'nw.gui'
+
+window.NitrousIO = Em.Application.extend
+  rootElement: "#app"
+  online: navigator.onLine
+  offline: Em.computed.not 'online'
+
+window.AIO = NitrousIO.create
+  config:
+    environment: "<%= config['environment'] %>"
+    app_name: "<%= config['app_name'] %>"
+    app_version: "<%= config['app_version'] %>"
+    host: "<%= config['host'] %>"
+    clientId: "<%= config['client_id'] %>"
+    clientSecret: "<%= config['client_secret'] %>"
+    pusherKey: "<%= config['pusher_key'] %>"
+    pusherEndpoint: "<%= config['host'] %>/pusher/auth"
+
+$(window).on 'online', ->
+  AIO.set 'online', true
+
+$(window).on 'offline', ->
+  AIO.set 'online', false
+
+win = gui.Window.get()
+$html = $('html')
+
+win.on 'focus', ->
+  $html.removeClass 'blurred'
+
+win.on 'blur', ->
+  $html.addClass 'blurred'
+
+if AIO.get('config.environment') == 'development'
+  $('#debug').show().click ->
+    win.showDevTools()

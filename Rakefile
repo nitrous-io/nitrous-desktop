@@ -3,6 +3,7 @@ require 'bundler'
 require 'fileutils'
 require 'logger'
 require 'pathname'
+require 'json'
 
 NODE_WEBKIT_VERSION = '0.7.5'
 ROOT_DIR = File.expand_path(File.dirname(__FILE__))
@@ -10,7 +11,7 @@ LOGGER = Logger.new(STDOUT)
 BUILD_DIR = "build"
 SOURCE_DIR = "src/"
 VENDOR_DIR = "vendor/"
-@target = ENV['TARGET'] || 'development'
+@target = ENV['TARGET'] ||= 'development'
 
 BUNDLES = %w(
   application.css
@@ -67,6 +68,11 @@ task :compile do
       env.cache = Sprockets::Cache::FileStore.new("tmp/sprockets/#{@target}")
     end
   end
+  sprockets.context_class.class_eval do
+    def config
+      @config_json ||= load_config
+    end
+  end
 
   # integrate emblem
   Emblem::Sprockets.integrate sprockets
@@ -104,10 +110,10 @@ task :build => [:clean, :compile] do
   end
 
   # copy font-awesome fonts
-  #execute 'cp', '-r', 'vendor/font-awesome/font', compiled_dir
+  execute 'cp', '-r', 'vendor/font-awesome/font', compiled_dir
 
   #if @target == 'production'
-    #filename = "NitrousIOPackagedApp-#{@target}-#{load_config['app_version']}"
+    #filename = "NitrousDesktop-#{@target}-#{load_config['app_version']}"
     #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
 
     #puts "=> build/#{@target}/#{filename}.zip"
@@ -127,4 +133,12 @@ task :default => [:run]
 def execute(*args)
   puts args.join(' ')
   system(*args)
+end
+
+def load_config
+  if json = JSON.parse(File.read(File.join(ROOT_DIR, 'config.json')))
+    json = json[ENV['TARGET']]
+    json['environment'] = ENV['TARGET']
+    json
+  end
 end

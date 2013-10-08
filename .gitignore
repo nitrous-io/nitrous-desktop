@@ -5,6 +5,7 @@ build/
 Gemfile.lock
 tmp/
 npmdebug.log
+config.json
 
 # node-webkit
 node-webkit/
