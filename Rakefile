@@ -11,14 +11,15 @@ LOGGER = Logger.new(STDOUT)
 BUILD_DIR = "build"
 SOURCE_DIR = "src/"
 VENDOR_DIR = "vendor/"
+SPEC_DIR = "spec/"
 @target = ENV['TARGET'] ||= 'development'
 
-BUNDLES = %w(
+@bundles = %w(
   application.css
   application.js
 )
 
-RESOURCES = %w(
+@resources = %w(
   favicon.ico
   index.html
   package.json
@@ -87,8 +88,15 @@ task :compile do
   sprockets.append_path File.dirname(Handlebars::Source.bundled_path)
 
   sprockets.append_path File.join(ROOT_DIR, VENDOR_DIR)
+  if @target == 'development'
+    sprockets.append_path File.join(ROOT_DIR, SPEC_DIR)
+  end
 
-  BUNDLES.each do |bundle|
+  bundles = @bundles
+  if @target == 'development'
+    bundles.concat %w(spec.html spec.js spec.css)
+  end
+  bundles.each do |bundle|
     asset = sprockets.find_asset(bundle)
     prefix = asset.pathname.to_s.split('/')[-2]
 
@@ -104,8 +112,9 @@ end
 task :build => [:clean, :compile] do
   puts "=> Building #{@target}..."
   compiled_dir = File.join BUILD_DIR, @target
+
   # copy other resources
-  RESOURCES.each do |resource|
+  @resources.each do |resource|
     execute 'cp', '-r', File.join(SOURCE_DIR, resource), compiled_dir
   end
 
