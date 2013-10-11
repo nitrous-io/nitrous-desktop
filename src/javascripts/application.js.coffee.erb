@@ -12,12 +12,13 @@ window.NitrousIO = Em.Application.extend
   rootElement: "#app"
   online: navigator.onLine
   offline: Em.computed.not 'online'
+  accessToken: null
 
 window.AIO = NitrousIO.create
   config:
     environment: "<%= config['environment'] %>"
-    app_name: "<%= config['app_name'] %>"
-    app_version: "<%= config['app_version'] %>"
+    appName: "<%= config['app_name'] %>"
+    appVersion: "<%= config['app_version'] %>"
     host: "<%= config['host'] %>"
     clientId: "<%= config['client_id'] %>"
     clientSecret: "<%= config['client_secret'] %>"
