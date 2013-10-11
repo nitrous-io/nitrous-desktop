@@ -39,9 +39,17 @@ task :dl do |t|
 end
 
 desc 'Run app'
-task :run => [:build] do |t|
+task :run do |t|
+  if ENV['NO_BUILD'] != '1'
+    Rake::Task["build"].invoke
+  end
   puts "=> Running #{@target}..."
   execute 'node-webkit/node-webkit.app/Contents/MacOS/node-webkit', File.join(BUILD_DIR, @target)
+end
+
+desc 'Watch for changes'
+task :watch => [:build] do |t|
+  execute 'bundle exec guard start'
 end
 
 task :clean do

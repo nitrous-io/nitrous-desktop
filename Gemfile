@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'rake',               '~> 10.1.0'
 gem 'sass',               '~> 3.2.10'
 gem 'coffee-script',      '~> 2.2.0'
 gem 'handlebars-source',  '~> 1.0.12'
@@ -9,3 +10,4 @@ gem 'emblem-sprockets',   '~> 0.1.0'
 gem 'sprockets',          '~> 2.10.0'
 gem 'closure-compiler',   '~> 1.1.10'
 gem 'yui-compressor',     '~> 0.12.0'
+gem 'guard-shell',        '~> 0.5.1'
