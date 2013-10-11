@@ -43,6 +43,8 @@ if AIO.get('config.environment') == 'development'
   $('#debug').show()
   $('#debug .devtools').click ->
     win.showDevTools()
+  $('#debug .reload').click ->
+    win.reloadIgnoringCache()
   $('#debug .spec').click ->
     gui.Window.open location.href.replace(/index\.html.*/, 'spec/spec.html'),
       position: 'center'
