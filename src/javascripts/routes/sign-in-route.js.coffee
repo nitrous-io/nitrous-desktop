@@ -1,4 +1,5 @@
 gui = require 'nw.gui'
+screen = window.screen
 
 AIO.SignInRoute = Em.Route.extend
   model: ->
@@ -9,6 +10,6 @@ AIO.SignInRoute = Em.Route.extend
     win.resizeTo 320, 480 + screen.availTop
     win.setResizable false
 
-  events: ->
+  actions:
     signedIn: ->
       @transitionTo 'main'

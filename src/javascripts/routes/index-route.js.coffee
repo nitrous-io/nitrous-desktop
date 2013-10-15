@@ -1,3 +1,7 @@
 AIO.IndexRoute = Em.Route.extend
   activate: ->
-    @transitionTo 'sign-in'
+    if accessToken = AIO.AccessToken.loadFromStorage()
+      AIO.set 'accessToken', accessToken
+      @transitionTo 'main'
+    else
+      @transitionTo 'sign-in'

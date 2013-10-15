@@ -1,14 +1,21 @@
 url = require 'url'
 
 describe 'AIO.AccessToken', ->
+  described_class = AIO.AccessToken
   accessToken = null
 
   beforeEach ->
-    accessToken = AIO.AccessToken.create
+    described_class.clearCache()
+    described_class.singleton = null
+    accessToken = described_class.create
       username: 'pete'
       password: 'foobar'
       clientId: 'deadbeefcafebabe'
       clientSecret: 'b00bbabeb00bbabe'
+
+  it 'sets default values', ->
+    expect(accessToken.get 'grantType').to.equal 'password'
+    expect(accessToken.get 'scope').to.equal 'public boxes push web user'
 
   describe '#save', ->
     beforeEach ->
@@ -27,7 +34,7 @@ describe 'AIO.AccessToken', ->
       expect(url.parse(request.url).path).to.equal '/oauth/token.json'
 
     context 'on response', ->
-      tokenString = 'abfb852d4e0e4000194920257b28a8100ef5a85ec6840f1db7b89a02ee3c1acf'
+      tokenString = 'foobarbazqux'
 
       beforeEach ->
         server.respondWith 'POST', /\/oauth\/token\.json$/, [
@@ -45,3 +52,28 @@ describe 'AIO.AccessToken', ->
         expect(accessToken.get 'token').not.to.exist
         server.respond()
         expect(accessToken.get 'token').to.equal tokenString
+
+      it 'sets the singleton attribute on class', ->
+        expect(described_class.singleton).to.be.null
+        server.respond()
+        expect(described_class.singleton).to.equal accessToken
+
+  describe '.saveToStorage', ->
+    beforeEach ->
+      accessToken = described_class.create token: 'foobarbazqux'
+      described_class.singleton = accessToken
+
+    it "saves the class's singleton to local storage", ->
+      described_class.saveToStorage()
+      json = JSON.parse(JSON.stringify(accessToken.toJSON())) # drop empty items
+      expect(AIO.localStorage.get 'accessToken').to.deep.equal json
+
+  describe '.loadFromStorage', ->
+    beforeEach ->
+      AIO.localStorage.set 'accessToken', access_token: 'foobarbazqux', scope: described_class.scope
+
+    it 'loads and returns the access token from local storage', ->
+      accessToken = described_class.loadFromStorage()
+      expect(accessToken).to.be.instanceOf described_class
+      expect(accessToken.get 'token').to.equal 'foobarbazqux'
+      expect(accessToken.get 'scope').to.equal described_class.scope
