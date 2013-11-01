@@ -1,0 +1,66 @@
+#sidebar
+  .lists
+    .boxes-list.list
+      h3 Boxes
+      a.refresh href='#'
+        i.icon-refresh
+        span Refresh
+      ul
+        li.selected
+          a href='#'
+            .state-orb.running
+            span node-box-foobar
+        li
+          a href='#'
+            .state-orb.stopped
+            span autoparts-test
+        li
+          a href='#'
+            .state-orb.terminated
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.starting
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+        li
+          a href='#'
+            .state-orb.running
+            span lvm-box
+    .public-keys-list.list
+      h3 Public Keys
+      a.refresh href='#'
+        i.icon-refresh
+        span Refresh
+      ul
+        li
+          a href='#'
+            i.icon-key
+            span raingrove@gmail.com
+#main
+  #content
+    #boxes-show-view
+  AIO.FooterView userBinding='AIO.currentUser'

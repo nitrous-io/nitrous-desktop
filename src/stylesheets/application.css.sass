@@ -11,6 +11,10 @@
   src: url('../resources/fonts/2650DC_0_0.eot')
   src: url('../resources/fonts/2650DC_0_0.eot?#iefix') format('embedded-opentype'), url('../resources/fonts/2650DC_0_0.woff') format('woff'), url('../resources/fonts/2650DC_0_0.ttf') format('truetype')
 
+html, body, #app
+  width: 100%
+  height: 100%
+
 html
   border-top: 1px solid #6a6a6a
   overflow: hidden
@@ -22,6 +26,31 @@ body
   position: fixed
   font-size: 13px
   -webkit-user-select: none
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"],
+.radio label,
+.checkbox label,
+.radio-inline,
+.checkbox-inline,
+.btn,
+.btn-link,
+.label[href]:hover,
+.label[href]:focus,
+a.badge:hover,
+a.badge:focus,
+.close:hover,
+.close:focus,
+button.close,
+a,
+p,
+div,
+.carousel-indicators li
+  cursor: default
 
 #debug
   display: none

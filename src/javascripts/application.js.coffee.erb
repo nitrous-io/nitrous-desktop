@@ -8,11 +8,18 @@
 
 gui = require 'nw.gui'
 
-window.NitrousIO = Em.Application.extend
+window.NitrousIO = Em.Application.extend Ember.Evented,
   rootElement: "#app"
   online: navigator.onLine
   offline: Em.computed.not 'online'
   accessToken: null
+  currentUser: null
+
+  reset: ->
+    @setProperties
+      currentUser: null
+      accessToken: null
+    @_super()
 
 window.AIO = NitrousIO.create
   config:
@@ -52,3 +59,9 @@ if AIO.get('config.environment') == 'development'
       width: 1024
       height: 768
       toolbar: false
+
+AIO.on 'InvalidAccessToken', ->
+  AIO.AccessToken.removeFromStorage()
+  AIO.set 'accessToken', null
+  AIO.set 'currentUser', null
+  AIO.Router.router.transitionTo 'sign-in'

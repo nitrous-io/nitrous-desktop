@@ -1,4 +1,4 @@
-#= require './base-model'
+#= require ./base-model
 
 AIO.AccessToken = klass = AIO.BaseModel.extend
   resourceOwnerId: Em.attr()
@@ -19,22 +19,20 @@ AIO.AccessToken = klass = AIO.BaseModel.extend
     @set 'grantType', 'password'
     @set 'scope', klass.scope
 
-  didSaveRecord: ->
-    klass.singleton = this
-    @_super()
+  saveToStorage: ->
+    AIO.localStorage.set 'accessToken', @toJSON()
 
 klass.reopenClass
   adapter: Em.RESTAdapter.create()
   url: "#{AIO.get 'config.host'}/oauth/token"
   scope: 'public boxes push web user'
   primaryKey: 'scope'
-  singleton: null
 
   find: ->
     @_super(@scope)
 
-  saveToStorage: ->
-    AIO.localStorage.set 'accessToken', @singleton.toJSON()
+  removeFromStorage: ->
+    AIO.localStorage.set 'accessToken', null
 
   loadFromStorage: ->
     if json = AIO.localStorage.get 'accessToken'

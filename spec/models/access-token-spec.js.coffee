@@ -1,13 +1,12 @@
 url = require 'url'
 
 describe 'AIO.AccessToken', ->
-  described_class = AIO.AccessToken
+  describedClass = AIO.AccessToken
   accessToken = null
 
   beforeEach ->
-    described_class.clearCache()
-    described_class.singleton = null
-    accessToken = described_class.create
+    describedClass.clearCache()
+    accessToken = describedClass.create
       username: 'pete'
       password: 'foobar'
       clientId: 'deadbeefcafebabe'
@@ -40,12 +39,11 @@ describe 'AIO.AccessToken', ->
         server.respondWith 'POST', /\/oauth\/token\.json$/, [
             200
             { 'Content-Type': 'application/json; charset=utf-8' }
-            JSON.stringify {
-              'access_token': tokenString
-              'resource_owner_id': 123
-              'scope': 'public boxes push web user'
-              'token_type': 'bearer'
-            }
+            JSON.stringify
+              access_token: tokenString
+              resource_owner_id: 123
+              scope: 'public boxes push web user'
+              token_type: 'bearer'
           ]
 
       it 'sets token attribute', ->
@@ -53,27 +51,21 @@ describe 'AIO.AccessToken', ->
         server.respond()
         expect(accessToken.get 'token').to.equal tokenString
 
-      it 'sets the singleton attribute on class', ->
-        expect(described_class.singleton).to.be.null
-        server.respond()
-        expect(described_class.singleton).to.equal accessToken
-
-  describe '.saveToStorage', ->
+  describe '#saveToStorage', ->
     beforeEach ->
-      accessToken = described_class.create token: 'foobarbazqux'
-      described_class.singleton = accessToken
+      accessToken = describedClass.create token: 'foobarbazqux'
 
-    it "saves the class's singleton to local storage", ->
-      described_class.saveToStorage()
+    it "saves the access token to local storage", ->
+      accessToken.saveToStorage()
       json = JSON.parse(JSON.stringify(accessToken.toJSON())) # drop empty items
       expect(AIO.localStorage.get 'accessToken').to.deep.equal json
 
   describe '.loadFromStorage', ->
     beforeEach ->
-      AIO.localStorage.set 'accessToken', access_token: 'foobarbazqux', scope: described_class.scope
+      AIO.localStorage.set 'accessToken', access_token: 'foobarbazqux', scope: describedClass.scope
 
     it 'loads and returns the access token from local storage', ->
-      accessToken = described_class.loadFromStorage()
-      expect(accessToken).to.be.instanceOf described_class
+      accessToken = describedClass.loadFromStorage()
+      expect(accessToken).to.be.instanceOf describedClass
       expect(accessToken.get 'token').to.equal 'foobarbazqux'
-      expect(accessToken.get 'scope').to.equal described_class.scope
+      expect(accessToken.get 'scope').to.equal describedClass.scope

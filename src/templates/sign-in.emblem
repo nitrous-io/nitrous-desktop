@@ -8,10 +8,10 @@ form submit='signIn'
       Em.TextField id='username-field' placeholder='Username' valueBinding="username" disabledBinding="isSaving"
 
     .form-group
-      Em.TextField type='Password' placeholder='Password' valueBinding="password" disabledBinding="isSaving"
+      Em.TextField id='password-field' type='password' placeholder='Password' valueBinding="password" disabledBinding="isSaving"
 
     .form-group
-      button.native disabled={signInButtonDisabled} Sign In
+      button#sign-in-button.native disabled={signInButtonDisabled} Sign In
 
     .links
       a href='#' click='forgotPassword' Forgot your password?

@@ -4,7 +4,8 @@
 #= require chai/chai-1.8.0
 #= require sinon/sinon-1.7.3
 #= require sinon-chai/sinon-chai-2.4.0
-#= require spec_helper
+#= require chai-jquery/chai-jquery-1.1.2
+#= require spec-helper
 #= require_tree .
 
 gui = require 'nw.gui'
