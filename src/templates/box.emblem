@@ -1,0 +1,66 @@
+div class={ :stack-image boxTemplate.runtime }
+
+.info
+  .info-row
+    .left
+    .right
+      h3
+        = name
+
+  .info-row
+    .left State
+    .right
+      = state
+
+  .info-row
+    .left
+    .right
+      button.btn.btn-white Shut Down
+      button.btn.btn-white Restart
+
+  .info-row
+    .left Memory
+    .right
+      | {{ memory }} MB
+
+  .info-row
+    .left Storage
+    .right
+      | {{ storage }} MB
+
+  .info-row
+    .left Region
+    .right
+      = region.description
+
+  .info-row
+    .left Stack
+    .right
+      | {{ version }} - {{ boxTemplate.name }}
+
+  .info-row.port-forwarding
+    .left Port Forwarding
+    .right
+      label Port
+      select multiple='multiple'
+        option
+          | 3000
+        option
+          | 4000
+      button.btn.btn-simple
+        i.icon-plus
+        span Add
+      button.btn.btn-simple
+        i.icon-minus
+        span Remove
+
+  .info-row
+    .left File Sync
+    .right
+      button.btn.btn-white Enable File Sync
+
+  .info-row.box-access
+    .left
+    .right
+      button.btn.btn-white IDE
+      button.btn.btn-white Terminal

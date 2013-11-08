@@ -2,6 +2,7 @@ gui = require 'nw.gui'
 
 AIO.SignInView = Em.View.extend
   elementId: 'sign-in-view'
+  templateName: 'sign-in'
 
   didEnterInvalidCredentials: (->
     @shakeWindow() if @get 'controller.invalidCredentials'

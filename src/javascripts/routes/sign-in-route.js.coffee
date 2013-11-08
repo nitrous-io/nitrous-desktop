@@ -7,8 +7,10 @@ AIO.SignInRoute = Em.Route.extend
 
   activate: ->
     win = gui.Window.get()
+    win.hide()
     win.resizeTo 320, 480 + screen.availTop
     win.setResizable false
+    win.show()
 
   actions:
     signedIn: ->

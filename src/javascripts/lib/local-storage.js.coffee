@@ -17,7 +17,7 @@ AIO.localStorage =
     keysToRemove = []
     for i in [0..(localStorage.length - 1)]
       key = localStorage.key(i)
-      if key.indexOf(@namespace + ':') == 0
+      if key && key.indexOf(@namespace + ':') == 0
         keysToRemove.push key
     for key in keysToRemove
       localStorage.removeItem key

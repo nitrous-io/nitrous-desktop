@@ -37,17 +37,17 @@ describe 'Sign In (/sign-in)', ->
                   JSON.stringify
                     access_token: 'foobarbazqux'
                     resource_owner_id: 123
-                    scope: 'public boxes push web user'
+                    scope: 'public boxes public_keys push web user'
                     token_type: 'bearer'
                 ]
 
-            it 'redirects to main route', (done) ->
+            it 'redirects to main.index route', (done) ->
               t.thenCheck done, ->
                 doAction()
-                mainRoute = spec.getRoute 'main'
-                expect(spec.getCurrentRoute()).not.to.equal mainRoute
+                mainIndexRoute = spec.getRoute 'main.index'
+                expect(spec.getCurrentRoute()).not.to.equal mainIndexRoute
                 server.respond()
-                expect(spec.getCurrentRoute()).to.equal mainRoute
+                expect(spec.getCurrentRoute()).to.equal mainIndexRoute
 
             it 'saves oauth token', (done) ->
               t.thenCheck done, ->

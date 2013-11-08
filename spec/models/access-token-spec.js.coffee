@@ -14,7 +14,7 @@ describe 'AIO.AccessToken', ->
 
   it 'sets default values', ->
     expect(accessToken.get 'grantType').to.equal 'password'
-    expect(accessToken.get 'scope').to.equal 'public boxes push web user'
+    expect(accessToken.get 'scope').to.equal 'public boxes public_keys push web user'
 
   describe '#save', ->
     beforeEach ->
@@ -29,7 +29,7 @@ describe 'AIO.AccessToken', ->
       expect(params.client_id).to.equal 'deadbeefcafebabe'
       expect(params.client_secret).to.equal 'b00bbabeb00bbabe'
       expect(params.grant_type).to.equal 'password'
-      expect(params.scope).to.equal 'public boxes push web user'
+      expect(params.scope).to.equal 'public boxes public_keys push web user'
       expect(url.parse(request.url).path).to.equal '/oauth/token.json'
 
     context 'on response', ->
@@ -42,7 +42,7 @@ describe 'AIO.AccessToken', ->
             JSON.stringify
               access_token: tokenString
               resource_owner_id: 123
-              scope: 'public boxes push web user'
+              scope: 'public boxes public_keys push web user'
               token_type: 'bearer'
           ]
 

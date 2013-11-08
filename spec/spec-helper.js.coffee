@@ -18,6 +18,10 @@ Em.Test.registerHelper 'thenCheck', (app, done, f) ->
 AIO.setupForTesting()
 AIO.injectTestHelpers()
 
+# don't wait for pending ajax requests
+delete $._data(document, 'events').ajaxStart
+delete $._data(document, 'events').ajaxStop
+
 mocha.setup
   ui: 'bdd'
   globals: ['jQuery*', '__ember*', 'stats', 'failures', 'runner', 'window',
@@ -64,15 +68,18 @@ window.spec =
 
 window.server = sinon.fakeServer.create()
 
+AIO.localStorage.namespace = 'aio-spec'
 gui = require 'nw.gui'
 win = gui.Window.get()
-AIO.localStorage.namespace = 'aio-spec'
+win.show()
 
 reset = ->
   window.server?.restore?()
   win.resizeTo.restore?()
   win.setResizable.restore?()
   win.moveTo.restore?()
+  win.show.restore?()
+  win.hide.restore?()
   AIO.localStorage.clear()
 
 beforeEach ->
@@ -80,6 +87,8 @@ beforeEach ->
   sinon.stub win, 'resizeTo'
   sinon.stub win, 'setResizable'
   sinon.stub win, 'moveTo'
+  sinon.stub win, 'show'
+  sinon.stub win, 'hide'
   Em.run ->
     AIO.reset()
   window.server = sinon.fakeServer.create()

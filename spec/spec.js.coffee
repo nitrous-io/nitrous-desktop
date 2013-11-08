@@ -13,9 +13,11 @@ win = gui.Window.get()
 
 $('#debug .devtools').click ->
   win.showDevTools()
+  false
 
 $('#debug .reload').click ->
   win.reloadIgnoringCache()
+  false
 
 window.nodeRequire = window.require
 window.nodeGlobal = window.global

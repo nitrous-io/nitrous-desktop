@@ -1,6 +1,9 @@
 #= require ./base-model
 
 AIO.Box = klass = AIO.BaseModel.extend
+  region: Em.belongsTo 'AIO.Region', key: 'region_id'
+  boxTemplate: Em.belongsTo 'AIO.BoxTemplate', key: 'box_template_id'
+
   name: Em.attr()
   state: Em.attr()
 
@@ -8,7 +11,6 @@ AIO.Box = klass = AIO.BaseModel.extend
   port: Em.attr()
 
   ownerId: Em.attr()
-  regionId: Em.attr()
 
   version: Em.attr()
   memory: Em.attr()
@@ -34,8 +36,6 @@ AIO.Box = klass = AIO.BaseModel.extend
         state = 'provisioning_failed'
       if state.match /ed$/
         state = state + '!'
-      else if state.match /ing$/
-        state = state + '...'
 
       state = state.split('_').map((t) -> t.capitalize()).join(' ')
   ).property 'state'
@@ -43,5 +43,4 @@ AIO.Box = klass = AIO.BaseModel.extend
 klass.reopenClass
   rootKey: 'box'
   collectionKey: 'boxes'
-  storageKey: 'boxes'
-  url: "#{AIO.get 'settings.host'}/api/v0/boxes"
+  url: "#{AIO.get 'config.host'}/api/v0/boxes"

@@ -25,7 +25,7 @@ AIO.AccessToken = klass = AIO.BaseModel.extend
 klass.reopenClass
   adapter: Em.RESTAdapter.create()
   url: "#{AIO.get 'config.host'}/oauth/token"
-  scope: 'public boxes push web user'
+  scope: 'public boxes public_keys push web user'
   primaryKey: 'scope'
 
   find: ->

@@ -14,6 +14,6 @@ form submit='signIn'
       button#sign-in-button.native disabled={signInButtonDisabled} Sign In
 
     .links
-      a href='#' click='forgotPassword' Forgot your password?
+      button.btn-link click='forgotPassword' Forgot your password?
       .pull-right
-        a href='#' click='signUp' Not a user? Sign up
+        button.btn-link click='signUp' Not a user? Sign up

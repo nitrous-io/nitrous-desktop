@@ -1,0 +1,7 @@
+h3 Public Keys
+button.refresh href='#'
+  i.icon-refresh
+  span refresh
+ul
+  each arrangedContent
+    AIO.PublicKeysListItemView

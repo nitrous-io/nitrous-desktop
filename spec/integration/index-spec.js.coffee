@@ -21,5 +21,5 @@ describe 'Index (/)', ->
     it 'initializes an access token object and redirects to main screen', (done) ->
       expect(AIO.get 'accessToken').not.to.exist
       visit('/').thenCheck done, ->
-        expect(spec.getCurrentRoute()).to.equal mainRoute
+        expect(spec.getCurrentRoute()).to.equal spec.getRoute('main.index')
         expect(AIO.get 'accessToken.token').to.equal 'foobarbazqux'

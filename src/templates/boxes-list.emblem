@@ -1,0 +1,7 @@
+h3 Boxes
+button.refresh
+  i.icon-refresh
+  span Refresh
+ul
+  each arrangedContent
+    AIO.BoxesListItemView

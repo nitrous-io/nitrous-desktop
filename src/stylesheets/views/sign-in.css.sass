@@ -6,11 +6,11 @@
   padding: 20px 20px 19px 20px
 
   .nitrous-logo
+    margin: 0 auto
     width: 256px
     height: 256px
-    margin: 0 auto
-    background-image: url('../resources/images/icon_256x256.png')
     background-size: 256px 256px
+    background-repeat: no-repeat
 
   h1
     font-family: 'EurostileLTPro-BoldEx2'
@@ -24,11 +24,21 @@
   input[type=text], input[type=password]
     width: 100%
 
+  #sign-in-button
+    width: 100%
+
   .links
     font-size: 12px
 
-  button
-    width: 100%
+    button
+      display: inline
+      padding: 0
+      margin: 0
+
+// images
+#sign-in-view
+  .nitrous-logo
+    background-image: url('../resources/images/icon_256x256.png')
 
 @media (-webkit-min-device-pixel-ratio: 2)
   #sign-in-view

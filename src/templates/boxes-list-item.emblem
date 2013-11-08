@@ -1,0 +1,3 @@
+div class={:state-orb state} title=prettyState
+span
+  = name
