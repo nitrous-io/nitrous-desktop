@@ -1,3 +1,4 @@
+AIO.MainMenuView
 #sidebar
   .lists
     = outlet boxesList

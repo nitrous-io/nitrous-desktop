@@ -7,6 +7,7 @@
 #= require aio
 
 gui = require 'nw.gui'
+appURL = location.origin + location.pathname
 
 window.NitrousIO = Em.Application.extend Ember.Evented,
   rootElement: "#app"
@@ -63,8 +64,16 @@ if AIO.get('config.environment') == 'development'
       toolbar: false
     false
 
-AIO.on 'InvalidAccessToken', ->
+clearAccessTokenAndRestart = ->
   AIO.AccessToken.removeFromStorage()
-  AIO.set 'accessToken', null
-  AIO.set 'currentUser', null
-  AIO.Router.router.transitionTo 'sign-in'
+  gui.Window.open appURL,
+    show: false
+    toolbar: false
+    focus: true
+  win.close()
+
+AIO.on 'InvalidAccessToken', ->
+  clearAccessTokenAndRestart()
+
+AIO.on 'SignOut', ->
+  clearAccessTokenAndRestart()

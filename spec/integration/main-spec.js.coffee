@@ -1,3 +1,5 @@
+gui = require 'nw.gui'
+
 describe 'Main (/main)', ->
   t = accessToken = null
 
@@ -13,15 +15,15 @@ describe 'Main (/main)', ->
         AIO.set 'currentUser', AIO.CurrentUser.create()
       server.respondWith 'GET', /\/api\/v0\/user\.json$/, [401, {}, '']
 
-    it 'clears access token and redirects to sign in', (done) ->
+    it 'clears access token and restarts app', (done) ->
       expect(AIO.get 'accessToken').to.exist
       expect(AIO.get 'currentUser').to.exist
       server.respond()
       t.thenCheck done, ->
-        expect(AIO.get 'accessToken').not.to.exist
-        expect(AIO.get 'currentUser').not.to.exist
         expect(AIO.AccessToken.loadFromStorage()).not.to.exist
-        expect(spec.getCurrentRoute()).to.equal spec.getRoute('sign-in')
+        win = gui.Window.get()
+        expect(gui.Window.open).to.have.been.called
+        expect(win.close).to.have.been.called
 
   context 'when fetching current user succeeds', ->
     beforeEach ->

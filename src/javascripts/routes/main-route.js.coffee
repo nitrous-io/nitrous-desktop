@@ -24,14 +24,7 @@ AIO.MainRoute = Em.Route.extend
   activate: ->
     win = gui.Window.get()
     win.hide()
-    screenWidth = (screen.availWidth - screen.availLeft)
-    screenHeight = (screen.availHeight - screen.availTop)
-    width = Math.min 800, screenWidth
-    height = Math.min 450, screenHeight
-    x = Math.floor((screenWidth - width) / 2) + screen.availLeft
-    y = Math.floor((screenHeight - height) / 2) + screen.availTop
-    win.moveTo x, y
-    win.resizeTo width, height
+    AIO.windowHelper.resizeAndMoveToCenter(800, 450)
     win.setResizable true
     win.show()
 

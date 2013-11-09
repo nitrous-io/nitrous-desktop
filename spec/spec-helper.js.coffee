@@ -80,20 +80,23 @@ reset = ->
   win.moveTo.restore?()
   win.show.restore?()
   win.hide.restore?()
+  gui.Window.open.restore?()
+  win.close.restore?()
   AIO.localStorage.clear()
 
 beforeEach ->
-  reset()
   sinon.stub win, 'resizeTo'
   sinon.stub win, 'setResizable'
   sinon.stub win, 'moveTo'
   sinon.stub win, 'show'
   sinon.stub win, 'hide'
+  sinon.stub gui.Window, 'open'
+  sinon.stub win, 'close'
   Em.run ->
     AIO.reset()
   window.server = sinon.fakeServer.create()
 
-afterAll = ->
+afterEach ->
   reset()
 
 window.onload = ->

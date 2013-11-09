@@ -8,12 +8,15 @@ AIO.SignInView = Em.View.extend
     @shakeWindow() if @get 'controller.invalidCredentials'
   ).observes 'controller.invalidCredentials'
 
+  didInsertElement: ->
+    @$('#username-field').focus()
+
   shakeWindow: ->
     win = gui.Window.get()
     x = win.x
     y = win.y
 
-    $usernameField = @$ '#username-field'
+    $usernameField = @$('#username-field')
 
     m = (d, c) ->
       $(i: win.x).animate({ i: x + d }, step: (val) ->

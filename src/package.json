@@ -1,5 +1,5 @@
 {
-  "name": "nitrous-desktop"
+  "name": "Nitrous Desktop"
 , "main": "index.html"
 , "window": {
     "show": false
