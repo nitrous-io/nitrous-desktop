@@ -5,7 +5,7 @@ require 'logger'
 require 'pathname'
 require 'json'
 
-NODE_WEBKIT_VERSION = '0.7.5'
+NODE_WEBKIT_VERSION = '0.8.0'
 ROOT_DIR = File.expand_path(File.dirname(__FILE__))
 LOGGER = Logger.new(STDOUT)
 BUILD_DIR = "build"
