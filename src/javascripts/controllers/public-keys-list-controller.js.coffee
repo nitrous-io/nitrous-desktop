@@ -1,1 +1,1 @@
-AIO.PublicKeysListController = Em.ArrayController.extend()
+App.PublicKeysListController = Em.ArrayController.extend()

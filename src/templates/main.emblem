@@ -1,4 +1,4 @@
-AIO.MainMenuView
+App.MainMenuView
 #sidebar
   .lists
     = outlet boxesList
@@ -6,4 +6,4 @@ AIO.MainMenuView
 #main
   #content
     = outlet content
-  AIO.FooterView userBinding='AIO.currentUser'
+  App.FooterView userBinding='App.currentUser'

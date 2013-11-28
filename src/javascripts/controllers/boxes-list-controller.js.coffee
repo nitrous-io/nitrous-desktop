@@ -1,4 +1,4 @@
-AIO.BoxesListController = Em.ArrayController.extend
+App.BoxesListController = Em.ArrayController.extend
   selectedItem: null
 
   selectItem: (item) ->

@@ -1,4 +1,4 @@
-AIO.BoxView = Em.View.extend
+App.BoxView = Em.View.extend
   elementId: 'box-view'
   templateName: 'box'
 

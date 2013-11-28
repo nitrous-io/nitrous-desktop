@@ -4,4 +4,4 @@ button.refresh href='#'
   span refresh
 ul
   each arrangedContent
-    AIO.PublicKeysListItemView
+    App.PublicKeysListItemView

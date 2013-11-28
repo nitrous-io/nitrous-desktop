@@ -1,1 +1,1 @@
-AIO.BoxController = Em.ObjectController.extend()
+App.BoxController = Em.ObjectController.extend()

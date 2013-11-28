@@ -1,7 +1,7 @@
-AIO.OAuthRESTAdapter = Em.RESTAdapter.extend
+App.OAuthRESTAdapter = Em.RESTAdapter.extend
   ajaxSettings: ->
     settings = @_super.apply this, arguments
-    if accessToken = AIO.get 'accessToken.token'
+    if accessToken = App.get 'accessToken.token'
       settings.headers ?= {}
       settings.headers.Authorization = "Bearer #{accessToken}"
     settings
@@ -10,5 +10,5 @@ AIO.OAuthRESTAdapter = Em.RESTAdapter.extend
     ajax = @_super.apply this, arguments
     ajax.fail (jqXHR) ->
       if jqXHR.status == 401
-        AIO.trigger 'InvalidAccessToken'
+        App.trigger 'InvalidAccessToken'
       jqXHR

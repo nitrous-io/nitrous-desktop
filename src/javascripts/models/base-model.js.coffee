@@ -1,6 +1,6 @@
-AIO.BaseModel = klass = Em.Model.extend
+App.BaseModel = klass = Em.Model.extend
   id: Em.attr()
 
 klass.reopenClass
-  adapter: AIO.OAuthRESTAdapter.create()
+  adapter: App.OAuthRESTAdapter.create()
   camelizeKeys: true

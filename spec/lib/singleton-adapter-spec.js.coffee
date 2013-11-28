@@ -1,12 +1,12 @@
-describe 'AIO.SingletonAdapter', ->
-  describedClass = AIO.SingletonAdapter
+describe 'App.SingletonAdapter', ->
+  describedClass = App.SingletonAdapter
   subject = null
 
   beforeEach ->
     subject = describedClass.create()
 
-  it 'is a subclass of AIO.OAuthRESTAdapter', ->
-    expect(subject).to.be.instanceOf AIO.OAuthRESTAdapter
+  it 'is a subclass of App.OAuthRESTAdapter', ->
+    expect(subject).to.be.instanceOf App.OAuthRESTAdapter
 
   describe '#buildURL', ->
     it 'returns a url with no id regardless of whether id is given', ->

@@ -1,1 +1,1 @@
-AIO.IndexController = Em.Controller.extend()
+App.IndexController = Em.Controller.extend()

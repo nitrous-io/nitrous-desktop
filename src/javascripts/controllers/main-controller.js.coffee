@@ -1,2 +1,2 @@
-AIO.MainController = Em.Controller.extend
-  modelBinding: 'AIO.currentUser'
+App.MainController = Em.Controller.extend
+  modelBinding: 'App.currentUser'

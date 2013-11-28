@@ -1,3 +1,3 @@
-AIO.BoxRoute = Em.Route.extend
+App.BoxRoute = Em.Route.extend
   renderTemplate: ->
     @render 'box', outlet: 'content'

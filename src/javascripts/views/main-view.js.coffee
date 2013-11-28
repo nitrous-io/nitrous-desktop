@@ -1,6 +1,6 @@
 gui = require 'nw.gui'
 
-AIO.MainView = Em.View.extend
+App.MainView = Em.View.extend
   elementId: 'main-view'
   templateName: 'main'
 

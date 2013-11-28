@@ -1,13 +1,13 @@
 gui = require 'nw.gui'
 screen = window.screen
 
-AIO.MainRoute = Em.Route.extend
+App.MainRoute = Em.Route.extend
   beforeModel: ->
-    if !AIO.get('accessToken')
+    if !App.get('accessToken')
       @transitionTo 'index'
 
   model: ->
-    AIO.CurrentUser.reload()
+    App.CurrentUser.reload()
 
   renderTemplate: ->
     @_super()
@@ -16,15 +16,15 @@ AIO.MainRoute = Em.Route.extend
 
   setupController: (controller, model) ->
     @_super(controller, model)
-    AIO.BoxTemplate.find()
-    AIO.Region.find()
-    @controllerFor('boxesList').set 'model', AIO.Box.find()
-    @controllerFor('publicKeysList').set 'model', AIO.PublicKey.find()
+    App.BoxTemplate.find()
+    App.Region.find()
+    @controllerFor('boxesList').set 'model', App.Box.find()
+    @controllerFor('publicKeysList').set 'model', App.PublicKey.find()
 
   activate: ->
     win = gui.Window.get()
     win.hide()
-    AIO.windowHelper.resizeAndMoveToCenter(800, 450)
+    App.windowHelper.resizeAndMoveToCenter(800, 450)
     win.setResizable true
     win.show()
 

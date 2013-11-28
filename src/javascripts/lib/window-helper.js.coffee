@@ -1,7 +1,7 @@
 gui = require 'nw.gui'
 screen = window.screen
 
-AIO.windowHelper =
+App.windowHelper =
   resizeAndMoveToCenter: (width, height) ->
     win = gui.Window.get()
     screenWidth = (screen.availWidth - screen.availLeft)

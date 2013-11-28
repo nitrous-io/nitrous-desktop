@@ -1,1 +1,1 @@
-AIO.MainIndexRoute = Em.Route.extend()
+App.MainIndexRoute = Em.Route.extend()

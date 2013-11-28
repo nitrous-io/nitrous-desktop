@@ -1,4 +1,4 @@
-AIO.BoxesListView = Em.View.extend
+App.BoxesListView = Em.View.extend
   elementId: 'boxes-list-view'
   classNames: ['list']
   templateName: 'boxes-list'

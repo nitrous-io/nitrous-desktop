@@ -15,8 +15,8 @@ Em.Test.registerHelper 'thenCheck', (app, done, f) ->
     catch e
       done(e)
 
-AIO.setupForTesting()
-AIO.injectTestHelpers()
+App.setupForTesting()
+App.injectTestHelpers()
 
 # don't wait for pending ajax requests
 delete $._data(document, 'events').ajaxStart
@@ -49,10 +49,10 @@ window.check = (done, f) ->
 
 window.spec =
   getRoute: (name) ->
-    AIO.__container__.lookup("route:#{name}")
+    App.__container__.lookup("route:#{name}")
 
   getController: (name) ->
-    AIO.__container__.lookup("controller:#{name}")
+    App.__container__.lookup("controller:#{name}")
 
   getViewById: (id) ->
     view = Em.View.views[id]
@@ -60,7 +60,7 @@ window.spec =
     view
 
   getMainRouter: ->
-    AIO.Router.router
+    App.Router.router
 
   getCurrentRoute: ->
     name = Em.get @getMainRouter(), 'currentHandlerInfos.lastObject.name'
@@ -68,7 +68,7 @@ window.spec =
 
 window.server = sinon.fakeServer.create()
 
-AIO.localStorage.namespace = 'aio-spec'
+App.localStorage.namespace = 'app-spec'
 gui = require 'nw.gui'
 win = gui.Window.get()
 win.show()
@@ -82,7 +82,7 @@ reset = ->
   win.hide.restore?()
   gui.Window.open.restore?()
   win.close.restore?()
-  AIO.localStorage.clear()
+  App.localStorage.clear()
 
 beforeEach ->
   sinon.stub win, 'resizeTo'
@@ -93,7 +93,7 @@ beforeEach ->
   sinon.stub gui.Window, 'open'
   sinon.stub win, 'close'
   Em.run ->
-    AIO.reset()
+    App.reset()
   window.server = sinon.fakeServer.create()
 
 afterEach ->

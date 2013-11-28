@@ -4,4 +4,4 @@ button.refresh
   span Refresh
 ul
   each arrangedContent
-    AIO.BoxesListItemView
+    App.BoxesListItemView

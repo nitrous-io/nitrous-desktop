@@ -1,6 +1,6 @@
 gui = require 'nw.gui'
 
-AIO.SignInController = Em.ObjectController.extend
+App.SignInController = Em.ObjectController.extend
   invalidCredentials: false
 
   signInButtonDisabled: (->
@@ -12,7 +12,7 @@ AIO.SignInController = Em.ObjectController.extend
       @set 'invalidCredentials', null
       model = @get 'model'
       model.save().then =>
-        AIO.set 'accessToken', model
+        App.set 'accessToken', model
         model.saveToStorage()
         @send 'signedIn'
       , (jqXHR) =>
@@ -26,7 +26,7 @@ AIO.SignInController = Em.ObjectController.extend
         @set 'isSaving', false
 
     forgotPassword: ->
-      gui.Shell.openExternal "#{AIO.get 'config.host'}/users/password/new"
+      gui.Shell.openExternal "#{App.get 'config.host'}/users/password/new"
 
     signUp: ->
-      gui.Shell.openExternal AIO.get('config.host')
+      gui.Shell.openExternal App.get('config.host')

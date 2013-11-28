@@ -1,5 +1,5 @@
-describedClass = TestBaseModel = AIO.BaseModel.extend()
+describedClass = TestBaseModel = App.BaseModel.extend()
 
-describe 'AIO.BaseModel', ->
+describe 'App.BaseModel', ->
   it 'camelizes keys', ->
     expect(describedClass.camelizeKeys).to.be.true

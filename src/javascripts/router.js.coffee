@@ -1,4 +1,4 @@
-AIO.Router.map ->
+App.Router.map ->
   @route 'sign-in'
   @resource 'main', ->
     @resource 'box', path: '/boxes/:box_id'

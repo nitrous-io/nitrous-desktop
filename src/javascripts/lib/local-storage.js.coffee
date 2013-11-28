@@ -1,6 +1,6 @@
 localStorage = window.localStorage
 
-AIO.localStorage =
+App.localStorage =
   namespace: 'aio'
 
   set: (key, value) ->

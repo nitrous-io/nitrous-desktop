@@ -1,6 +1,6 @@
 gui = require 'nw.gui'
 
-AIO.SignInView = Em.View.extend
+App.SignInView = Em.View.extend
   elementId: 'sign-in-view'
   templateName: 'sign-in'
 

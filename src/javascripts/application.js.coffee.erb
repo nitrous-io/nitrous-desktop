@@ -4,7 +4,7 @@
 #= require ember-model/ember-model-0.0.10
 #= require bootstrap3/js/bootstrap
 #= require_self
-#= require aio
+#= require app
 
 gui = require 'nw.gui'
 appURL = location.origin + location.pathname
@@ -22,7 +22,7 @@ window.NitrousIO = Em.Application.extend Ember.Evented,
       accessToken: null
     @_super()
 
-window.AIO = NitrousIO.create
+window.App = NitrousIO.create
   config:
     environment: "<%= config['environment'] %>"
     appName: "<%= config['app_name'] %>"
@@ -34,10 +34,10 @@ window.AIO = NitrousIO.create
     pusherEndpoint: "<%= config['host'] %>/pusher/auth"
 
 $(window).on 'online', ->
-  AIO.set 'online', true
+  App.set 'online', true
 
 $(window).on 'offline', ->
-  AIO.set 'online', false
+  App.set 'online', false
 
 win = gui.Window.get()
 $html = $('html')
@@ -48,7 +48,7 @@ win.on 'focus', ->
 win.on 'blur', ->
   $html.addClass 'blurred'
 
-if AIO.get('config.environment') == 'development'
+if App.get('config.environment') == 'development'
   $('#debug').show()
   $('#debug .devtools').click ->
     win.showDevTools()
@@ -65,15 +65,15 @@ if AIO.get('config.environment') == 'development'
     false
 
 clearAccessTokenAndRestart = ->
-  AIO.AccessToken.removeFromStorage()
+  App.AccessToken.removeFromStorage()
   gui.Window.open appURL,
     show: false
     toolbar: false
     focus: true
   win.close()
 
-AIO.on 'InvalidAccessToken', ->
+App.on 'InvalidAccessToken', ->
   clearAccessTokenAndRestart()
 
-AIO.on 'SignOut', ->
+App.on 'SignOut', ->
   clearAccessTokenAndRestart()

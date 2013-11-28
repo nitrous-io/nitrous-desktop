@@ -1,6 +1,6 @@
 #= require ./base-model
 
-AIO.CurrentUser = klass = AIO.BaseModel.extend
+App.CurrentUser = klass = App.BaseModel.extend
   username: Em.attr()
   email: Em.attr()
   fullName: Em.attr()
@@ -17,6 +17,6 @@ AIO.CurrentUser = klass = AIO.BaseModel.extend
   freeN2o: Em.computed.alias 'freeN2O'
 
 klass.reopenClass
-  adapter: AIO.SingletonAdapter.create()
+  adapter: App.SingletonAdapter.create()
   rootKey: 'user'
-  url: "#{AIO.get 'config.host'}/api/v0/user"
+  url: "#{App.get 'config.host'}/api/v0/user"

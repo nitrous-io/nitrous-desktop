@@ -1,6 +1,6 @@
 gui = require 'nw.gui'
 
-AIO.MainMenuView = Em.View.extend
+App.MainMenuView = Em.View.extend
   mainMenu: null
 
   init: ->
@@ -11,7 +11,7 @@ AIO.MainMenuView = Em.View.extend
     accountMenuSignOut = new gui.MenuItem(label: 'Sign Out')
 
     accountMenuSignOut.click = ->
-      AIO.trigger 'SignOut'
+      App.trigger 'SignOut'
 
     mainMenu.append(mainMenuAccount)
     mainMenuAccount.submenu = accountMenu

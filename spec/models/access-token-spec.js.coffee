@@ -1,7 +1,7 @@
 url = require 'url'
 
-describe 'AIO.AccessToken', ->
-  describedClass = AIO.AccessToken
+describe 'App.AccessToken', ->
+  describedClass = App.AccessToken
   accessToken = null
 
   beforeEach ->
@@ -58,11 +58,11 @@ describe 'AIO.AccessToken', ->
     it "saves the access token to local storage", ->
       accessToken.saveToStorage()
       json = JSON.parse(JSON.stringify(accessToken.toJSON())) # drop empty items
-      expect(AIO.localStorage.get 'accessToken').to.deep.equal json
+      expect(App.localStorage.get 'accessToken').to.deep.equal json
 
   describe '.loadFromStorage', ->
     beforeEach ->
-      AIO.localStorage.set 'accessToken', access_token: 'foobarbazqux', scope: describedClass.scope
+      App.localStorage.set 'accessToken', access_token: 'foobarbazqux', scope: describedClass.scope
 
     it 'loads and returns the access token from local storage', ->
       accessToken = describedClass.loadFromStorage()

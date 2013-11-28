@@ -51,11 +51,11 @@ describe 'Sign In (/sign-in)', ->
 
             it 'saves oauth token', (done) ->
               t.thenCheck done, ->
-                expect(AIO.get 'accessToken').not.to.exist
+                expect(App.get 'accessToken').not.to.exist
                 doAction()
                 server.respond()
-                expect(AIO.get 'accessToken.token').to.equal 'foobarbazqux'
-                expect(AIO.AccessToken.loadFromStorage().get('token')).to.equal 'foobarbazqux'
+                expect(App.get 'accessToken.token').to.equal 'foobarbazqux'
+                expect(App.AccessToken.loadFromStorage().get('token')).to.equal 'foobarbazqux'
 
           context 'when sign in fails', ->
             signInView = null

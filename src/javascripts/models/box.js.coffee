@@ -1,8 +1,8 @@
 #= require ./base-model
 
-AIO.Box = klass = AIO.BaseModel.extend
-  region: Em.belongsTo 'AIO.Region', key: 'region_id'
-  boxTemplate: Em.belongsTo 'AIO.BoxTemplate', key: 'box_template_id'
+App.Box = klass = App.BaseModel.extend
+  region: Em.belongsTo 'App.Region', key: 'region_id'
+  boxTemplate: Em.belongsTo 'App.BoxTemplate', key: 'box_template_id'
 
   name: Em.attr()
   state: Em.attr()
@@ -24,7 +24,7 @@ AIO.Box = klass = AIO.BaseModel.extend
   running: Em.computed.equal 'state', 'running'
   stopped: Em.computed.equal 'state', 'stopped'
 
-  currentUserIdBinding: Em.Binding.oneWay 'AIO.currentUser.id'
+  currentUserIdBinding: Em.Binding.oneWay 'App.currentUser.id'
 
   ownBox: (->
     @get('currentUserId') == @get('ownerId')
@@ -43,4 +43,4 @@ AIO.Box = klass = AIO.BaseModel.extend
 klass.reopenClass
   rootKey: 'box'
   collectionKey: 'boxes'
-  url: "#{AIO.get 'config.host'}/api/v0/boxes"
+  url: "#{App.get 'config.host'}/api/v0/boxes"

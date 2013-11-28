@@ -1,5 +1,5 @@
-describe 'AIO.OAuthRESTAdapter', ->
-  describedClass = AIO.OAuthRESTAdapter
+describe 'App.OAuthRESTAdapter', ->
+  describedClass = App.OAuthRESTAdapter
   adapter = null
 
   beforeEach ->
@@ -10,10 +10,10 @@ describe 'AIO.OAuthRESTAdapter', ->
 
   describe '#ajaxSettings', ->
     beforeEach ->
-      sinon.stub(AIO, 'get').withArgs('accessToken.token').returns 'cafebabe1234'
+      sinon.stub(App, 'get').withArgs('accessToken.token').returns 'cafebabe1234'
 
     afterEach ->
-      AIO.get.restore()
+      App.get.restore()
 
     it 'adds Authorization header', ->
       expect(adapter.ajaxSettings().headers).to.have.property 'Authorization', 'Bearer cafebabe1234'

@@ -1,4 +1,4 @@
-AIO.BoxesListItemView = Em.View.extend
+App.BoxesListItemView = Em.View.extend
   classNames: ['boxes-list-item-view']
   classNameBindings: 'selected'
   tagName: 'li'

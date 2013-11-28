@@ -4,23 +4,23 @@ describe 'Main (/main)', ->
   t = accessToken = null
 
   beforeEach ->
-    accessToken = AIO.AccessToken.create(accessToken: 'foobarbazqux', scope: AIO.AccessToken.scope, resource_owner_id: 123)
+    accessToken = App.AccessToken.create(accessToken: 'foobarbazqux', scope: App.AccessToken.scope, resource_owner_id: 123)
     accessToken.saveToStorage()
-    AIO.set 'accessToken', accessToken
+    App.set 'accessToken', accessToken
     t = visit('/main')
 
   context 'when fetching current user fails with 401 unauthorized', ->
     beforeEach ->
       Em.run ->
-        AIO.set 'currentUser', AIO.CurrentUser.create()
+        App.set 'currentUser', App.CurrentUser.create()
       server.respondWith 'GET', /\/api\/v0\/user\.json$/, [401, {}, '']
 
     it 'clears access token and restarts app', (done) ->
-      expect(AIO.get 'accessToken').to.exist
-      expect(AIO.get 'currentUser').to.exist
+      expect(App.get 'accessToken').to.exist
+      expect(App.get 'currentUser').to.exist
       server.respond()
       t.thenCheck done, ->
-        expect(AIO.AccessToken.loadFromStorage()).not.to.exist
+        expect(App.AccessToken.loadFromStorage()).not.to.exist
         win = gui.Window.get()
         expect(gui.Window.open).to.have.been.called
         expect(win.close).to.have.been.called
@@ -47,11 +47,11 @@ describe 'Main (/main)', ->
             rewardable_invites_count: 10
       ]
 
-    it 'sets AIO.currentUser', (done) ->
-      expect(AIO.get 'accessToken').to.exist
+    it 'sets App.currentUser', (done) ->
+      expect(App.get 'accessToken').to.exist
       server.respond()
       t.thenCheck done, ->
-        currentUser = AIO.get 'currentUser'
+        currentUser = App.get 'currentUser'
         expect(currentUser).to.exist
         expect(currentUser.get 'id').to.equal 123
         expect(currentUser.get 'username').to.equal 'pete'
