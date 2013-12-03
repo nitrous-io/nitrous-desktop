@@ -5,7 +5,7 @@
   , "host": "https://www.n2odev.com:5000"
   , "client_id": "575b8c5a4eefa8d243a89fc1204315f106be895fc11f6d4fd4cd96a4efaa4d10"
   , "client_secret": "06273e99bc713d28ac628e2e79c2ac5d4de7742c1bb27e7560491b784fea5373"
-  , "pusher_key": "8378c5bfda48f93951e5"
+  , "shover_server_uri": "https://www.n2odev.com:5003"
   }
 , "staging": {
     "app_name": "Nitrous Desktop (staging)"
@@ -13,7 +13,7 @@
   , "host": "https://www.n2ostaging.com"
   , "client_id": ""
   , "client_secret": ""
-  , "pusher_key": ""
+  , "shover_server_uri": ""
   }
 , "production": {
     "app_name": "Nitrous Desktop"
@@ -21,6 +21,6 @@
   , "host": "https://www.nitrous.io"
   , "client_id": ""
   , "client_secret": ""
-  , "pusher_key": ""
+  , "shover_server_uri": ""
   }
 }

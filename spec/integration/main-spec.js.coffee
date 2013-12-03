@@ -26,6 +26,8 @@ describe 'Main (/main)', ->
         expect(win.close).to.have.been.called
 
   context 'when fetching current user succeeds', ->
+    mainController = null
+
     beforeEach ->
       server.respondWith 'GET', /\/api\/v0\/user\.json$/, [
         200
@@ -46,6 +48,11 @@ describe 'Main (/main)', ->
             referral_link: '/join/foobar'
             rewardable_invites_count: 10
       ]
+      mainController = spec.getController 'main'
+      sinon.stub mainController, 'connectToShover'
+
+    afterEach ->
+      mainController.connectToShover.restore()
 
     it 'sets App.currentUser', (done) ->
       expect(App.get 'accessToken').to.exist
@@ -55,3 +62,9 @@ describe 'Main (/main)', ->
         expect(currentUser).to.exist
         expect(currentUser.get 'id').to.equal 123
         expect(currentUser.get 'username').to.equal 'pete'
+
+    it 'connects to shover', (done) ->
+      expect(mainController.connectToShover).not.to.have.been.called
+      server.respond()
+      t.thenCheck done, ->
+        expect(mainController.connectToShover).to.have.been.called

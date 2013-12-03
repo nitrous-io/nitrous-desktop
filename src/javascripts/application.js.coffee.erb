@@ -4,6 +4,7 @@
 #= require ember-model/ember-model-0.0.10
 #= require bootstrap3/js/bootstrap
 #= require_self
+#= require aio/aio
 #= require app
 
 gui = require 'nw.gui'
@@ -28,10 +29,10 @@ window.App = NitrousIO.create
     appName: "<%= config['app_name'] %>"
     appVersion: "<%= config['app_version'] %>"
     host: "<%= config['host'] %>"
+    apiURI: "<%= config['host'] %>/api/v0"
     clientId: "<%= config['client_id'] %>"
     clientSecret: "<%= config['client_secret'] %>"
-    pusherKey: "<%= config['pusher_key'] %>"
-    pusherEndpoint: "<%= config['host'] %>/pusher/auth"
+    shoverServerURI: "<%= config['shover_server_uri'] %>"
 
 $(window).on 'online', ->
   App.set 'online', true

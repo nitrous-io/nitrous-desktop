@@ -66,15 +66,12 @@ window.spec =
     name = Em.get @getMainRouter(), 'currentHandlerInfos.lastObject.name'
     @getMainRouter().getHandler(name)
 
-window.server = sinon.fakeServer.create()
-
 App.localStorage.namespace = 'app-spec'
 gui = require 'nw.gui'
 win = gui.Window.get()
 win.show()
 
-reset = ->
-  window.server?.restore?()
+window.reset = ->
   win.resizeTo.restore?()
   win.setResizable.restore?()
   win.moveTo.restore?()
@@ -85,6 +82,9 @@ reset = ->
   App.localStorage.clear()
 
 beforeEach ->
+  window.server?.restore?()
+  window.server = sinon.fakeServer.create()
+  reset()
   sinon.stub win, 'resizeTo'
   sinon.stub win, 'setResizable'
   sinon.stub win, 'moveTo'
@@ -94,10 +94,15 @@ beforeEach ->
   sinon.stub win, 'close'
   Em.run ->
     App.reset()
-  window.server = sinon.fakeServer.create()
 
 afterEach ->
   reset()
 
 window.onload = ->
   mocha.run()
+
+if window.SockJS
+  window.OriginalSockJS = window.SockJS
+  class window.FakeSockJS extends window.OriginalSockJS
+    constructor: ->
+  window.SockJS = window.FakeSockJS
