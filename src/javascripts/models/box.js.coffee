@@ -24,11 +24,9 @@ App.Box = klass = App.BaseModel.extend
   running: Em.computed.equal 'state', 'running'
   stopped: Em.computed.equal 'state', 'stopped'
 
-  currentUserIdBinding: Em.Binding.oneWay 'App.currentUser.id'
-
   ownBox: (->
-    @get('currentUserId') == @get('ownerId')
-  ).property 'currentUserId', 'ownerId'
+    App.get('currentUser.id') == @get('ownerId')
+  ).property 'App.currentUser.id', 'ownerId'
 
   prettyState: (->
     if state = @get 'state'
@@ -39,6 +37,15 @@ App.Box = klass = App.BaseModel.extend
 
       state = state.split('_').map((t) -> t.capitalize()).join(' ')
   ).property 'state'
+
+  start: ->
+    @makeRequest 'start', 'POST'
+
+  stop: ->
+    @makeRequest 'stop', 'POST'
+
+  restart: ->
+    @makeRequest 'restart', 'POST'
 
 klass.reopenClass
   rootKey: 'box'

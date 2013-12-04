@@ -12,11 +12,16 @@ div class={ :stack-image boxTemplate.runtime }
     .right
       = state
 
-  .info-row
-    .left
-    .right
-      button.btn.btn-white Shut Down
-      button.btn.btn-white Restart
+  if ownBox
+    .info-row.box-control-row
+      .left
+      .right
+        if running
+          button.btn.btn-white click='stop' Shut Down
+          button.btn.btn-white click='restart' Restart
+        else
+          if stopped
+            button.btn.btn-white click='start' Start
 
   .info-row
     .left Memory
@@ -64,3 +69,4 @@ div class={ :stack-image boxTemplate.runtime }
     .right
       button.btn.btn-white IDE
       button.btn.btn-white Terminal
+      button.btn.btn-white SSH
