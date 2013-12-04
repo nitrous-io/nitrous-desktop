@@ -67,6 +67,6 @@ div class={ :stack-image boxTemplate.runtime }
   .info-row.box-access
     .left
     .right
-      button.btn.btn-white IDE
-      button.btn.btn-white Terminal
-      button.btn.btn-white SSH
+      button.btn.btn-white click='ide' IDE
+      button.btn.btn-white click='terminal' Terminal
+      button.btn.btn-white click='ssh' SSH

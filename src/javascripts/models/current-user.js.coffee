@@ -16,7 +16,12 @@ App.CurrentUser = klass = App.BaseModel.extend
   ).property 'usedN2O', 'maxN2O'
   freeN2o: Em.computed.alias 'freeN2O'
 
+  getSignInToken: ->
+    @makeRequest('sign_in_token', 'GET').then (hash) ->
+      hash.sign_in_token
+
 klass.reopenClass
   adapter: App.SingletonAdapter.create()
   rootKey: 'user'
+  primaryKey: 'noKey' # ignore primary key since it's a singleton resource
   url: "#{App.get 'config.host'}/api/v0/user"
