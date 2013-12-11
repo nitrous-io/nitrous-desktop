@@ -134,6 +134,74 @@
   #footer-view
     -webkit-order: 2
 
+  .btn-simple
+    border: none
+    background: white
+    color: #666
+    padding: 0 8px
+    font-size: 10px
+    outline: none
+
+    span
+      display: none
+
+    &:active
+      box-shadow: none
+      color: black
+
+  .btn-white
+    position: relative
+    top: -1px
+    background: white
+    border-color: #999
+    color: black
+    font-size: 12px
+    padding: 0 12px
+    margin-right: 4px
+    outline: none
+
+    &:active
+      background: #f0f0f0
+
+  .editable-list-view
+    label
+      padding-left: 2px
+      margin: 0
+      font-weight: normal
+      color: #999
+
+    > ul
+      position: relative
+      display: block
+      width: 100%
+      height: 55px
+      margin: 0
+      border-top: 1px solid #ccc
+      border-bottom: 1px solid #ccc
+      border-left: none
+      border-right: none
+      text-overflow: ellipsis
+      overflow-x: hidden
+      overflow-y: auto
+      list-style: none
+      padding: 0
+
+      > li
+        border-bottom: 1px solid #ebebeb
+        padding-left: 2px
+
+        &:last-of-type
+          border-bottom: none
+
+        &.selected
+          background: #3874d7
+          color: white
+
+  .editable-list-item-text-field
+    border: none
+    padding: 0 2px
+    width: 100%
+
 html.blurred
   #main-view
     #sidebar

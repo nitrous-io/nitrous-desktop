@@ -1,0 +1,17 @@
+with view
+  if label
+    label
+      = label
+  ul
+    each item in content.arrangedContent
+      App.EditableListItemView contentBinding="item"
+    if addingNewItem
+      li
+        App.EditableListItemTextField
+
+  button.btn.btn-simple click="add target='view'"
+    i.icon-plus
+    span Add
+  button.btn.btn-simple click="remove target='view'" disabled={ hasNoSelectedItem }
+    i.icon-minus
+    span Remove

@@ -24,6 +24,10 @@ App.Box = klass = App.BaseModel.extend
   running: Em.computed.equal 'state', 'running'
   stopped: Em.computed.equal 'state', 'stopped'
 
+  forwardedPorts: (->
+    App.ForwardedPorts.forBoxId @get('id')
+  ).property 'id'
+
   ownBox: (->
     App.get('currentUser.id') == @get('ownerId')
   ).property 'App.currentUser.id', 'ownerId'

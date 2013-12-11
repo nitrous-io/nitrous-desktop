@@ -26,3 +26,12 @@ describe 'App.Box', ->
       it 'does POST restart', ->
         box.restart()
         expect(box.makeRequest).to.have.been.calledWith 'restart', 'POST'
+
+  describe '#forwardedPorts', ->
+    forwardedPorts = null
+
+    beforeEach ->
+      forwardedPorts = App.ForwardedPorts.forBoxId(123)
+
+    it 'returns ForwardedPorts object for the box', ->
+      expect(box.get 'forwardedPorts').to.equal forwardedPorts

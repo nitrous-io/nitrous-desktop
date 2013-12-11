@@ -10,3 +10,6 @@ App.windowHelper =
     y = Math.max(Math.floor((screenHeight - height) / 2), screen.availTop)
     win.moveTo x, y
     win.resizeTo width, height
+
+  setMainMenu: (menu) ->
+    gui.Window.get().menu = menu

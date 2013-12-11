@@ -46,19 +46,8 @@ div class={ :stack-image boxTemplate.runtime }
   .info-row.port-forwarding
     .left Port Forwarding
     .right
-      label Port
-      select multiple='multiple'
-        option
-          | 3000
-        option
-          | 4000
-      button.btn.btn-simple
-        i.icon-plus
-        span Add
-      button.btn.btn-simple
-        i.icon-minus
-        span Remove
-
+      button.btn.btn-white Enable Port Forwarding
+      App.EditableListView label="Port" contentBinding="forwardedPorts"
   .info-row
     .left File Sync
     .right
@@ -67,6 +56,7 @@ div class={ :stack-image boxTemplate.runtime }
   .info-row.box-access
     .left
     .right
-      button.btn.btn-white click='ide' IDE
-      button.btn.btn-white click='terminal' Terminal
-      button.btn.btn-white click='ssh' SSH
+      if running
+        button.btn.btn-white click='ide' IDE
+        button.btn.btn-white click='terminal' Terminal
+        button.btn.btn-white click='ssh' SSH

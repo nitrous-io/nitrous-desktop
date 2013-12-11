@@ -80,6 +80,7 @@ window.reset = ->
   gui.Window.open.restore?()
   win.close.restore?()
   App.localStorage.clear()
+  App.windowHelper.setMainMenu.restore?()
 
 beforeEach ->
   window.server?.restore?()
@@ -92,6 +93,7 @@ beforeEach ->
   sinon.stub win, 'hide'
   sinon.stub gui.Window, 'open'
   sinon.stub win, 'close'
+  sinon.stub App.windowHelper, 'setMainMenu'
   Em.run ->
     App.reset()
 

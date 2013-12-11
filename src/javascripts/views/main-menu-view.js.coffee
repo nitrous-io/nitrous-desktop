@@ -20,4 +20,4 @@ App.MainMenuView = Em.View.extend
     @set 'mainMenu', mainMenu
 
   didInsertElement: ->
-    gui.Window.get().menu = @get 'mainMenu'
+    App.windowHelper.setMainMenu @get('mainMenu')
