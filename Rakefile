@@ -5,7 +5,7 @@ require 'logger'
 require 'pathname'
 require 'json'
 
-NODE_WEBKIT_VERSION = '0.8.0'
+NODE_WEBKIT_VERSION = '0.8.2'
 ROOT_DIR = File.expand_path(File.dirname(__FILE__))
 LOGGER = Logger.new(STDOUT)
 BUILD_DIR = "build"
@@ -28,14 +28,28 @@ SPEC_DIR = "spec/"
 
 Bundler.require
 
-desc "Download node-webkit v#{NODE_WEBKIT_VERSION}"
-task :dl do |t|
+desc "Setup development environment"
+task :setup do |t|
+  puts "=> Initializing Submodules..."
+  execute 'git', 'submodule', 'update', '--init'
+  puts "=> Downloading node-webkit #{NODE_WEBKIT_VERSION} for OS X..."
   FileUtils.mkdir_p 'node-webkit'
   Dir.chdir 'node-webkit' do
     filename = "node-webkit-v#{NODE_WEBKIT_VERSION}-osx-ia32.zip"
     execute 'curl', "https://s3.amazonaws.com/node-webkit/v#{NODE_WEBKIT_VERSION}/#{filename}", '-o', filename
     execute 'unzip', filename
   end
+  puts "=> Compiling FSEvents native module..."
+  Dir.chdir File.join(VENDOR_DIR, 'fsevents') do
+    execute 'nw-gyp', 'configure', "--target=#{NODE_WEBKIT_VERSION}"
+    execute 'nw-gyp', 'build'
+  end
+  puts "=> Done!"
+end
+
+desc "Build FSEvents"
+task :build_fsevents do |t|
+
 end
 
 desc 'Run app'
@@ -57,7 +71,7 @@ task :clean do
   execute "rm -rf build/'#{@target}'"
 end
 
-desc 'clean all'
+desc 'Clean all'
 task :clean_all do
   puts '=> Cleaning all...'
   execute "rm -rf build/*"
@@ -121,13 +135,23 @@ task :build => [:clean, :compile] do
   puts "=> Building #{@target}..."
   compiled_dir = File.join BUILD_DIR, @target
 
+  # copy fsevents module
+  modules_dir = File.join(compiled_dir, 'node_modules')
+  fsevents_dir = File.join(modules_dir, 'fsevents')
+  fsevents_release_dir = File.join(fsevents_dir, 'build', 'Release')
+  FileUtils.mkpath fsevents_release_dir
+  %w(fsevents.js LICENSE package.json).each do |file|
+    execute 'cp', File.join(VENDOR_DIR, 'fsevents', file), fsevents_dir
+  end
+  execute 'cp', File.join(VENDOR_DIR, 'fsevents', 'build', 'Release', 'fswatch.node'), fsevents_release_dir
+
   # copy other resources
   @resources.each do |resource|
     execute 'cp', '-r', File.join(SOURCE_DIR, resource), compiled_dir
   end
 
   # copy font-awesome fonts
-  execute 'cp', '-r', 'vendor/font-awesome/font', compiled_dir
+  execute 'cp', '-r', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
   #if @target == 'production'
     #filename = "NitrousDesktop-#{@target}-#{load_config['app_version']}"
@@ -138,7 +162,7 @@ task :build => [:clean, :compile] do
 end
 
 %w(development staging production).each do |target|
-  desc "build for #{target}"
+  desc "Build for #{target}"
   task target do
     @target = ENV['TARGET'] = target
     Rake::Task["build"].invoke

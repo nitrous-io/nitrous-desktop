@@ -1,0 +1,3 @@
+[submodule "vendor/fsevents"]
+	path = vendor/fsevents
+	url = git@github.com:action-io/fsevents.git
