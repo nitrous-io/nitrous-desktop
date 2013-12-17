@@ -25,11 +25,11 @@ App.Box = klass = App.BaseModel.extend
   stopped: Em.computed.equal 'state', 'stopped'
 
   forwardedPorts: (->
-    App.ForwardedPorts.forBoxId @get('id')
+    App.ForwardedPorts.forBox(this) if @get 'id'
   ).property 'id'
 
   fileSync: (->
-    App.FileSync.forBoxId @get('id')
+    App.FileSync.forBox(this) if @get 'id'
   ).property 'id'
 
   ownBox: (->

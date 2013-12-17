@@ -7,7 +7,7 @@ describe 'App.ForwardedPorts', ->
   it 'is an array proxy', ->
     expect(describedClass.prototype).to.be.an.instanceOf Em.ArrayProxy
 
-  it 'makes "create" method private to enforce the use of #forBoxId factory method', ->
+  it 'makes "create" method private to enforce the use of #forBox factory method', ->
     expect(describedClass.create).not.to.exist
     expect(describedClass._create()).to.be.an.instanceOf describedClass
 
@@ -35,10 +35,10 @@ describe 'App.ForwardedPorts', ->
       subject.save()
       expect(App.localStorage.get 'box:123:forwardedPorts').to.deep.equal { ports: [3000, 3500, 4000] }
 
-  describe '.forBoxId', ->
+  describe '.forBox', ->
     context 'when it does not exist in the local storage', ->
       it 'creates a new instance of App.ForwardedPorts', ->
-        obj = describedClass.forBoxId(9999)
+        obj = describedClass.forBox(Em.Object.create id: 9999)
         expect(obj).to.be.an.instanceOf App.ForwardedPorts
         expect(obj.get 'boxId').to.equal 9999
         expect(obj.get 'content').to.deep.equal []
@@ -48,7 +48,7 @@ describe 'App.ForwardedPorts', ->
         App.localStorage.set 'box:111:forwardedPorts', { ports: [3100, 3200, 4000] }
 
       it 'loads it', ->
-        obj = describedClass.forBoxId(111)
+        obj = describedClass.forBox(Em.Object.create id: 111)
         expect(obj).to.be.an.instanceOf App.ForwardedPorts
         expect(obj.get 'boxId').to.equal 111
         expect(obj.get 'length').to.equal 3
@@ -64,7 +64,7 @@ describe 'App.ForwardedPorts', ->
         App.localStorage.set 'box:222:forwardedPorts', { ports: [3000, 3200, 4300] }
 
       it 'loads the cached object', ->
-        obj = describedClass.forBoxId(222)
+        obj = describedClass.forBox(Em.Object.create id: 222)
         expect(obj).to.be.an.instanceOf App.ForwardedPorts
         expect(obj.get 'boxId').to.equal 222
         expect(obj.get 'length').to.equal 3
@@ -74,5 +74,5 @@ describe 'App.ForwardedPorts', ->
         expect(obj.get 'content.0.port').to.equal 3000
         expect(obj.get 'content.1.port').to.equal 3200
         expect(obj.get 'content.2.port').to.equal 4300
-        obj2 = describedClass.forBoxId(222)
+        obj2 = describedClass.forBox(Em.Object.create id: 222)
         expect(obj).to.equal obj2

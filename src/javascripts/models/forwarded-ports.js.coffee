@@ -35,7 +35,8 @@ klass.create = undefined
 klass.reopenClass
   _cache: {}
 
-  forBoxId: (id) ->
+  forBox: (box) ->
+    id = box.get 'id'
     @_cache[id] ||= if settings = App.localStorage.get makeKey(id)
       ports = (settings.ports || []).map (p) ->
         App.ForwardedPort.create port: p

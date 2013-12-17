@@ -145,6 +145,12 @@ task :build => [:clean, :compile] do
   end
   execute 'cp', File.join(VENDOR_DIR, 'fsevents', 'build', 'Release', 'fswatch.node'), fsevents_release_dir
 
+  # copy other modules
+  execute 'cp', '-r', File.join(VENDOR_DIR, 'app-path'), modules_dir
+
+  # copy programs
+  execute 'cp', '-r', File.join(VENDOR_DIR, 'programs'), compiled_dir
+
   # copy other resources
   @resources.each do |resource|
     execute 'cp', '-r', File.join(SOURCE_DIR, resource), compiled_dir
