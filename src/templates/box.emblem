@@ -46,12 +46,18 @@ div class={ :stack-image boxTemplate.runtime }
   .info-row.port-forwarding
     .left Port Forwarding
     .right
-      button.btn.btn-white Enable Port Forwarding
+      if forwardedPorts.enabled
+        button.btn.btn-white click='togglePortForwarding' Disable Port Forwarding
+      else
+        button.btn.btn-white click='togglePortForwarding' Enable Port Forwarding
       App.EditableListView label="Port" contentBinding="forwardedPorts"
   .info-row
     .left File Sync
     .right
-      button.btn.btn-white Enable File Sync
+      if fileSync.enabled
+        button.btn.btn-white click='toggleFileSync' Disable File Sync
+      else
+        button.btn.btn-white click='toggleFileSync' Enable File Sync
 
   .info-row.box-access
     .left

@@ -33,5 +33,15 @@ describe 'App.Box', ->
     beforeEach ->
       forwardedPorts = App.ForwardedPorts.forBoxId(123)
 
-    it 'returns ForwardedPorts object for the box', ->
+    it 'returns App.ForwardedPorts object for the box', ->
       expect(box.get 'forwardedPorts').to.equal forwardedPorts
+
+  describe '#fileSync', ->
+    fileSync = null
+
+    beforeEach ->
+      fileSync = App.FileSync.forBoxId(123)
+
+    it 'returns App.FileSync object for the box', ->
+      expect(box.get 'fileSync').to.equal fileSync
+

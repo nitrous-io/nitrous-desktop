@@ -28,6 +28,10 @@ App.Box = klass = App.BaseModel.extend
     App.ForwardedPorts.forBoxId @get('id')
   ).property 'id'
 
+  fileSync: (->
+    App.FileSync.forBoxId @get('id')
+  ).property 'id'
+
   ownBox: (->
     App.get('currentUser.id') == @get('ownerId')
   ).property 'App.currentUser.id', 'ownerId'

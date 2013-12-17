@@ -33,11 +33,11 @@ describe 'App.ForwardedPorts', ->
 
     it 'saves obj to local storage', ->
       subject.save()
-      expect(App.localStorage.get 'box:123:forwardedPorts').to.deep.equal [3000, 3500, 4000]
+      expect(App.localStorage.get 'box:123:forwardedPorts').to.deep.equal { ports: [3000, 3500, 4000] }
 
   describe '.forBoxId', ->
     context 'when it does not exist in the local storage', ->
-      it 'creates a new instance of ForwardedPorts', ->
+      it 'creates a new instance of App.ForwardedPorts', ->
         obj = describedClass.forBoxId(9999)
         expect(obj).to.be.an.instanceOf App.ForwardedPorts
         expect(obj.get 'boxId').to.equal 9999
@@ -45,7 +45,7 @@ describe 'App.ForwardedPorts', ->
 
     context 'when it exists in the local storage', ->
       beforeEach ->
-        App.localStorage.set 'box:111:forwardedPorts', [3100, 3200, 4000]
+        App.localStorage.set 'box:111:forwardedPorts', { ports: [3100, 3200, 4000] }
 
       it 'loads it', ->
         obj = describedClass.forBoxId(111)
@@ -61,7 +61,7 @@ describe 'App.ForwardedPorts', ->
 
     context 'when it is already loaded', ->
       beforeEach ->
-        App.localStorage.set 'box:222:forwardedPorts', [3000, 3200, 4300]
+        App.localStorage.set 'box:222:forwardedPorts', { ports: [3000, 3200, 4300] }
 
       it 'loads the cached object', ->
         obj = describedClass.forBoxId(222)

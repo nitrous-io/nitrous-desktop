@@ -26,16 +26,19 @@ App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
 
   save: ->
     if boxId = @get 'boxId'
-      App.localStorage.set makeKey(boxId), @get('arrangedContent').map (p) -> p.get 'port'
+      App.localStorage.set makeKey(boxId),
+        ports: @get('arrangedContent').map (p) -> p.get 'port'
+
+klass._create = klass.create
+klass.create = undefined
 
 klass.reopenClass
   _cache: {}
 
   forBoxId: (id) ->
-    @_cache[id] ||= if ports = App.localStorage.get makeKey(id)
-      klass._create boxId: id, content: ports.map((p) -> App.ForwardedPort.create port: p)
+    @_cache[id] ||= if settings = App.localStorage.get makeKey(id)
+      ports = (settings.ports || []).map (p) ->
+        App.ForwardedPort.create port: p
+      klass._create boxId: id, content: ports
     else
       klass._create boxId: id
-
-klass._create = klass.create
-klass.create = undefined

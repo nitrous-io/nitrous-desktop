@@ -14,23 +14,38 @@ App.BoxController = Em.ObjectController.extend
     start: ->
       box = @get 'content'
       box.start()
+      false
 
     stop: ->
       box = @get 'content'
       box.stop()
+      false
 
     restart: ->
       box = @get 'content'
       box.restart()
+      false
 
     ide: ->
       App.get('currentUser').getSignInToken().then (signInToken) =>
         gui.Shell.openExternal @makeSignInURI("/app#/boxes/#{@get 'id'}/ide", signInToken)
+      false
 
     terminal: ->
       App.get('currentUser').getSignInToken().then (signInToken) =>
         gui.Shell.openExternal @makeSignInURI("/app#/boxes/#{@get 'id'}/terminal", signInToken)
+      false
 
     ssh: ->
       box = @get 'content'
       gui.Shell.openExternal "ssh://action@#{@get 'host'}:#{@get 'port'}"
+      false
+
+    togglePortForwarding: ->
+      box = @get 'content'
+      false
+
+    toggleFileSync: ->
+      box = @get 'content'
+      box.toggleProperty 'fileSync.enabled'
+      false

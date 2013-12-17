@@ -20,12 +20,14 @@ App.EditableListView = Em.View.extend
   actions:
     add: ->
       @set 'addingNewItem', true
+      false
 
     remove: ->
       list = @get 'content'
       item = @get 'selectedItem'
       list.remove item
       @set 'selectedItem', null
+      false
 
 App.EditableListItemTextField = Em.TextField.extend
   classNames: ['editable-list-item-text-field']

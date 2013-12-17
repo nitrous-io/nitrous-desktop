@@ -24,9 +24,12 @@ App.SignInController = Em.ObjectController.extend
           window.alert errorMessage ? 'Unable to connect to Nitrous.IO, please try again later.'
 
         @set 'isSaving', false
+      false
 
     forgotPassword: ->
       gui.Shell.openExternal "#{App.get 'config.host'}/users/password/new"
+      false
 
     signUp: ->
       gui.Shell.openExternal App.get('config.host')
+      false
