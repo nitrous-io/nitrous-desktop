@@ -43,6 +43,11 @@ div class={ :stack-image boxTemplate.runtime }
     .right
       | {{ version }} - {{ boxTemplate.name }}
 
+  .info-row
+    .left SSH URI
+    .right.selectable
+      | ssh://action@{{ host }}:{{ port }}
+
   .info-row.port-forwarding
     .left Port Forwarding
     .right
@@ -55,9 +60,9 @@ div class={ :stack-image boxTemplate.runtime }
     .left File Sync
     .right
       if fileSync.enabled
-        button.btn.btn-white click='toggleFileSync' Disable File Sync
+        button.btn.btn-white click='toggleFileSync' disabled={ fileSync.togglingDisabled } Disable File Sync
       else
-        button.btn.btn-white click='toggleFileSync' Enable File Sync
+        button.btn.btn-white click='toggleFileSync' disabled={ fileSync.togglingDisabled } Enable File Sync
 
   .info-row.box-access
     .left

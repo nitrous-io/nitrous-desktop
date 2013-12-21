@@ -40,6 +40,9 @@ $(window).on 'online', ->
 $(window).on 'offline', ->
   App.set 'online', false
 
+$(window).on 'beforeunload', ->
+  App.Watcher.stopAll()
+
 win = gui.Window.get()
 $html = $('html')
 

@@ -21,17 +21,32 @@ class App.Watcher extends EventEmitter
         @emit 'change'
       , @delay)
 
+  _clearNotifyTimeout: ->
+    if @notifyTimeout
+      window.clearTimeout @notifyTimeout
+      @notifyTimeout = null
+
 if os.type() == 'Darwin'
   fsevents = require 'fsevents'
+  startedWatchers = []
 
   App.Watcher::start = ->
     @stop() if @fsevents
     @fsevents = fsevents(@path)
+    startedWatchers.push(this)
     @fsevents.on 'change', (path) =>
       @_notify(path)
 
   App.Watcher::stop = ->
+    @_clearNotifyTimeout()
     if @fsevents
       @fsevents.stop()
       @fsevents.removeAllListeners()
       @fsevents = undefined
+    index = startedWatchers.indexOf(this)
+    startedWatchers.splice(index, 1) if index != -1
+
+  App.Watcher.stopAll = ->
+    startedWatchers.forEach (watcher) ->
+      watcher.stop()
+    startedWatchers = null
