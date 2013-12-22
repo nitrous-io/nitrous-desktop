@@ -10,6 +10,8 @@ App.BoxController = Em.ObjectController.extend
       window.encodeURIComponent(path)
     ]
 
+  fileSyncTogglingDisabled: false
+
   actions:
     start: ->
       box = @get 'content'
@@ -48,4 +50,8 @@ App.BoxController = Em.ObjectController.extend
     toggleFileSync: ->
       box = @get 'content'
       box.toggleProperty 'fileSync.enabled'
+      @set 'fileSyncTogglingDisabled', true
+      Em.run.later(=>
+        @set 'fileSyncTogglingDisabled', false
+      , 1000)
       false

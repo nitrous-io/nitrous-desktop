@@ -43,31 +43,31 @@ div class={ :stack-image boxTemplate.runtime }
     .right
       | {{ version }} - {{ boxTemplate.name }}
 
-  .info-row
-    .left SSH URI
-    .right.selectable
-      | ssh://action@{{ host }}:{{ port }}
+  if running
+    .info-row
+      .left SSH URI
+      .right.selectable
+        = sshURI
 
-  .info-row.port-forwarding
-    .left Port Forwarding
-    .right
-      if forwardedPorts.enabled
-        button.btn.btn-white click='togglePortForwarding' Disable Port Forwarding
-      else
-        button.btn.btn-white click='togglePortForwarding' Enable Port Forwarding
-      App.EditableListView label="Port" contentBinding="forwardedPorts"
-  .info-row
-    .left File Sync
-    .right
-      if fileSync.enabled
-        button.btn.btn-white click='toggleFileSync' disabled={ fileSync.togglingDisabled } Disable File Sync
-      else
-        button.btn.btn-white click='toggleFileSync' disabled={ fileSync.togglingDisabled } Enable File Sync
+    .info-row.port-forwarding
+      .left Port Forwarding
+      .right
+        if forwardedPorts.enabled
+          button.btn.btn-white click='togglePortForwarding' Disable Port Forwarding
+        else
+          button.btn.btn-white click='togglePortForwarding' Enable Port Forwarding
+        App.EditableListView label="Port" contentBinding="forwardedPorts"
+    .info-row
+      .left File Sync
+      .right
+        if fileSync.enabled
+          button.btn.btn-white click='toggleFileSync' disabled={ fileSyncTogglingDisabled } Disable File Sync
+        else
+          button.btn.btn-white click='toggleFileSync' disabled={ fileSyncTogglingDisabled } Enable File Sync
 
-  .info-row.box-access
-    .left
-    .right
-      if running
+    .info-row.box-access
+      .left
+      .right
         button.btn.btn-white click='ide' IDE
         button.btn.btn-white click='terminal' Terminal
         button.btn.btn-white click='ssh' SSH

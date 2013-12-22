@@ -12,11 +12,11 @@ describe 'App.FileSync', ->
     subject = null
 
     beforeEach ->
-      sinon.stub describedClass.prototype, 'enabledDidChange'
-      subject = describedClass._create(boxId: 123)
+      sinon.stub describedClass.prototype, '_startOrStopWatching'
+      subject = describedClass._create box: Em.Object.create(id:123)
 
     afterEach ->
-      describedClass::enabledDidChange.restore()
+      describedClass::_startOrStopWatching.restore()
 
     it 'saves obj to local storage', ->
       subject.set 'enabled', true
@@ -28,18 +28,17 @@ describe 'App.FileSync', ->
 
   describe '.forBox', ->
     beforeEach ->
-      sinon.stub describedClass.prototype, 'enabledDidChange'
+      sinon.stub describedClass.prototype, '_startOrStopWatching'
 
     afterEach ->
-      describedClass::enabledDidChange.restore()
+      describedClass::_startOrStopWatching.restore()
 
     context 'when it does not exist in the local storage', ->
       it 'creates a new instance of App.FileSync', ->
-        obj = describedClass.forBox(Em.Object.create id: 9999, name: 'rails-box', host: 'rails-box.example.com', port: 12345)
+        mockBox = Em.Object.create id: 9999, name: 'rails-box', host: 'rails-box.example.com', port: 12345
+        obj = describedClass.forBox(mockBox)
         expect(obj).to.be.an.instanceOf App.FileSync
-        expect(obj.get 'boxId').to.equal 9999
-        expect(obj.get 'boxName').to.equal 'rails-box'
-        expect(obj.get 'syncURI').to.equal 'ssh://action@rails-box.example.com:12345/workspace'
+        expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'enabled').to.be.false
 
     context 'when it exists in the local storage', ->
@@ -47,11 +46,10 @@ describe 'App.FileSync', ->
         App.localStorage.set 'box:111:fileSync', { enabled: true }
 
       it 'loads it', ->
-        obj = describedClass.forBox(Em.Object.create id: 111, name: 'node-box', host: 'node-box.example.com', port: 22345)
+        mockBox = Em.Object.create id: 111, name: 'node-box', host: 'node-box.example.com', port: 22345
+        obj = describedClass.forBox(mockBox)
         expect(obj).to.be.an.instanceOf App.FileSync
-        expect(obj.get 'boxId').to.equal 111
-        expect(obj.get 'boxName').to.equal 'node-box'
-        expect(obj.get 'syncURI').to.equal 'ssh://action@node-box.example.com:22345/workspace'
+        expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'enabled').to.be.true
 
     context 'when it is already loaded', ->
@@ -59,11 +57,10 @@ describe 'App.FileSync', ->
         App.localStorage.set 'box:222:fileSync', { enabled: true }
 
       it 'loads the cached object', ->
-        obj = describedClass.forBox(Em.Object.create id: 222, name: 'django-box', host: 'django-box.example.com', port: 32768)
+        mockBox = Em.Object.create id: 222, name: 'django-box', host: 'django-box.example.com', port: 32768
+        obj = describedClass.forBox(mockBox)
         expect(obj).to.be.an.instanceOf App.FileSync
-        expect(obj.get 'boxId').to.equal 222
-        expect(obj.get 'boxName').to.equal 'django-box'
-        expect(obj.get 'syncURI').to.equal 'ssh://action@django-box.example.com:32768/workspace'
+        expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'enabled').to.be.true
-        obj2 = describedClass.forBox(Em.Object.create id: 222, name: 'django-box')
+        obj2 = describedClass.forBox(mockBox)
         expect(obj).to.equal obj2

@@ -18,13 +18,9 @@ makeKey = (boxId) ->
   "box:#{boxId}:fileSync"
 
 App.FileSync = klass = Em.Object.extend
+  box: null
   enabled: false
-  togglingDisabled: false
   syncing: false
-  lastError: null
-  boxId: null
-  boxName: null
-  syncURI: null
   watcher: null
   shouldSyncAgain: false
   shouldIgnoreArchives: false
@@ -33,12 +29,16 @@ App.FileSync = klass = Em.Object.extend
   init: ->
     @_super.apply this, arguments
     Em.run.next =>
-      @_enabledDidChange()
+      @_startOrStopWatching()
 
-  _enabledDidChange: (->
-    @set 'togglingDisabled', true
+  save: ->
+    if boxId = @get 'box.id'
+      App.localStorage.set makeKey(boxId),
+        enabled: @get 'enabled'
+
+  _startOrStopWatching: (->
     @save()
-    if @get 'enabled'
+    if @get('enabled') && @get('box.state') == 'running'
       if nitrousPath
         @_startWatching()
       else
@@ -48,20 +48,10 @@ App.FileSync = klass = Em.Object.extend
           @_startWatching()
     else
       @_stopWatching()
-  ).observes 'enabled'
-
-  save: ->
-    if boxId = @get 'boxId'
-      App.localStorage.set makeKey(boxId),
-        enabled: @get 'enabled'
-
-  _reenableToggling: ->
-    Em.run.later(=>
-      @set 'togglingDisabled', false
-    , 1000)
+  ).observes 'enabled', 'box.state'
 
   _startWatching: ->
-    boxPath = path.join nitrousPath, @get('boxName')
+    boxPath = path.join nitrousPath, @get('box.name')
     console.log "File Sync: start watching #{boxPath}"
     fs.mkdir nitrousPath, '0755', (err) =>
       fs.mkdir boxPath, '0755', (err) =>
@@ -71,19 +61,16 @@ App.FileSync = klass = Em.Object.extend
         # perform initial sync
         @_performSync =>
           watcher.start()
-          @_reenableToggling()
 
   _stopWatching: ->
     if retrySchedule = @get 'retrySchedule'
       Em.run.cancel(retrySchedule)
       @set 'retrySchedule', null
     if watcher = @get 'watcher'
-      boxName = @get 'boxName'
-      boxPath = path.join nitrousPath, @get('boxName')
+      boxPath = path.join nitrousPath, @get('box.name')
       console.log "File Sync: stop watching #{boxPath}"
       watcher.stop()
       @set 'watcher', null
-    @_reenableToggling()
 
   _performSync: (cb) ->
     if @get 'syncing'
@@ -92,10 +79,11 @@ App.FileSync = klass = Em.Object.extend
       cb?()
     else
       @set 'syncing', true
-      localPath = path.join nitrousPath, @get('boxName')
+      box = @get 'box'
+      localPath = path.join nitrousPath, box.get('name')
       fs.mkdir nitrousPath, '0755', (err) =>
         fs.exists localPath, (exists) =>
-          remotePath = @get 'syncURI'
+          remotePath = "#{box.get 'sshURI'}/workspace"
           args = [
             localPath
             remotePath
@@ -161,9 +149,7 @@ klass.reopenClass
 
   forBox: (box) ->
     id = box.get 'id'
-    name = box.get 'name'
-    syncURI = "ssh://action@#{box.get 'host'}:#{box.get 'port'}/workspace"
     @_cache[id] ||= if settings = App.localStorage.get makeKey(id)
-      klass._create boxId: id, boxName: name, syncURI: syncURI, enabled: settings.enabled
+      klass._create box: box, enabled: settings.enabled
     else
-      klass._create boxId: id, boxName: name, syncURI: syncURI
+      klass._create box: box

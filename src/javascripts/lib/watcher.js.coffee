@@ -49,4 +49,4 @@ if os.type() == 'Darwin'
   App.Watcher.stopAll = ->
     startedWatchers.forEach (watcher) ->
       watcher.stop()
-    startedWatchers = null
+    startedWatchers = []

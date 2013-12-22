@@ -24,6 +24,12 @@ App.Box = klass = App.BaseModel.extend
   running: Em.computed.equal 'state', 'running'
   stopped: Em.computed.equal 'state', 'stopped'
 
+  init: ->
+    @_super.apply this, arguments
+    Em.run.next =>
+      @get 'forwardedPorts'
+      @get 'fileSync'
+
   forwardedPorts: (->
     App.ForwardedPorts.forBox(this) if @get 'id'
   ).property 'id'
@@ -35,6 +41,10 @@ App.Box = klass = App.BaseModel.extend
   ownBox: (->
     App.get('currentUser.id') == @get('ownerId')
   ).property 'App.currentUser.id', 'ownerId'
+
+  sshURI: (->
+    "ssh://action@#{@get 'host'}:#{@get 'port'}"
+  ).property 'host', 'port'
 
   prettyState: (->
     if state = @get 'state'

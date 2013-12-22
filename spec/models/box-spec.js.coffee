@@ -6,7 +6,7 @@ describe 'App.Box', ->
     expect(describedClass.prototype).to.be.an.instanceOf App.BaseModel
 
   beforeEach ->
-    box = describedClass.create id: 123
+    box = describedClass.create id: 123, host: 'box.example.com', port: 12345
 
   describe 'box control actions', ->
     beforeEach ->
@@ -44,3 +44,8 @@ describe 'App.Box', ->
 
     it 'returns App.FileSync object for the box', ->
       expect(box.get 'fileSync').to.equal fileSync
+
+  describe 'computed properties', ->
+    describe 'sshURI', ->
+      it 'returns SSH URI', ->
+        expect(box.get 'sshURI').to.equal 'ssh://action@box.example.com:12345'
