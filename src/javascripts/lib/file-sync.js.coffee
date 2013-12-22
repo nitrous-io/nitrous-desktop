@@ -1,9 +1,9 @@
 appPath = require 'app-path'
 childProcess = require 'child_process'
+console = window.console
 fs = require 'fs'
 os = require 'os'
 path = require 'path'
-console = window.console
 
 IGNORE_LIST = 'Name {.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes}'
 UNISON_BIN_PATH = path.join(appPath, 'programs',
@@ -31,13 +31,13 @@ App.FileSync = klass = Em.Object.extend
     Em.run.next =>
       @_startOrStopWatching()
 
-  save: ->
+  save: (->
     if boxId = @get 'box.id'
       App.localStorage.set makeKey(boxId),
         enabled: @get 'enabled'
+  ).observes 'enabled'
 
   _startOrStopWatching: (->
-    @save()
     if @get('enabled') && @get('box.state') == 'running'
       if nitrousPath
         @_startWatching()
@@ -51,8 +51,9 @@ App.FileSync = klass = Em.Object.extend
   ).observes 'enabled', 'box.state'
 
   _startWatching: ->
-    boxPath = path.join nitrousPath, @get('box.name')
-    console.log "File Sync: start watching #{boxPath}"
+    boxName = @get 'box.name'
+    boxPath = path.join nitrousPath, boxName
+    console.log "File Sync: start watching #{boxName} - #{boxPath}"
     fs.mkdir nitrousPath, '0755', (err) =>
       fs.mkdir boxPath, '0755', (err) =>
         @set 'watcher', watcher = new App.Watcher(nitrousPath)
@@ -67,8 +68,9 @@ App.FileSync = klass = Em.Object.extend
       Em.run.cancel(retrySchedule)
       @set 'retrySchedule', null
     if watcher = @get 'watcher'
-      boxPath = path.join nitrousPath, @get('box.name')
-      console.log "File Sync: stop watching #{boxPath}"
+      boxName = @get 'box.name'
+      boxPath = path.join nitrousPath, boxName
+      console.log "File Sync: stop watching #{boxName} - #{boxPath}"
       watcher.stop()
       @set 'watcher', null
 
@@ -84,16 +86,24 @@ App.FileSync = klass = Em.Object.extend
       fs.mkdir nitrousPath, '0755', (err) =>
         fs.exists localPath, (exists) =>
           remotePath = "#{box.get 'sshURI'}/workspace"
+
+          sshArgs = [
+            '-o UserKnownHostsFile=/dev/null'       # ignore known hosts
+            '-o StrictHostKeyChecking=no'           # no host key checking
+            '-o PreferredAuthentications=publickey' # pub key authentication only
+            '-c blowfish-cbc'                       # use blowfish cipher
+          ]
+
           args = [
             localPath
             remotePath
-            '-auto' # auto accept default actions
+            '-auto'  # auto accept default actions
             '-batch' # ask no questions
-            '-perms=777' # sync all permissions
+            '-perms=777'  # sync all permissions
             '-confirmbigdel=false' # don't ask about whole replica deletes
-            '-log=false' # don't log
+            '-log=false'  # don't log
             '-rsrc=false' # don't sync resource fork
-            '-sshargs', '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey -c blowfish-cbc'
+            '-sshargs', sshArgs.join ' '
             '-ignore', IGNORE_LIST
             '-prefer', remotePath
           ]

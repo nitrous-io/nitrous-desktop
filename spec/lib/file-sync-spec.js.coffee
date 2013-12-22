@@ -8,7 +8,7 @@ describe 'App.FileSync', ->
     expect(describedClass.create).not.to.exist
     expect(describedClass._create()).to.be.an.instanceOf describedClass
 
-  describe '#save', ->
+  context 'when enabled property is changed', ->
     subject = null
 
     beforeEach ->
@@ -20,10 +20,8 @@ describe 'App.FileSync', ->
 
     it 'saves obj to local storage', ->
       subject.set 'enabled', true
-      subject.save()
       expect(App.localStorage.get 'box:123:fileSync').to.deep.equal { enabled: true }
       subject.set 'enabled', false
-      subject.save()
       expect(App.localStorage.get 'box:123:fileSync').to.deep.equal { enabled: false }
 
   describe '.forBox', ->
