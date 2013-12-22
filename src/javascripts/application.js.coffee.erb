@@ -10,6 +10,10 @@
 gui = require 'nw.gui'
 appURL = location.origin + location.pathname
 
+process.on 'uncaughtException', (err) ->
+  console.log "Uncaught Exception: #{err.stack}"
+  # TODO: airbrake
+
 window.NitrousIO = Em.Application.extend Ember.Evented,
   rootElement: "#app"
   online: navigator.onLine
@@ -42,6 +46,7 @@ $(window).on 'offline', ->
 
 $(window).on 'beforeunload', ->
   App.Watcher.stopAll()
+  null
 
 win = gui.Window.get()
 $html = $('html')
