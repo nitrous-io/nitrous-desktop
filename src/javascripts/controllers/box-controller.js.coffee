@@ -11,6 +11,7 @@ App.BoxController = Em.ObjectController.extend
     ]
 
   fileSyncTogglingDisabled: false
+  portForwardingTogglingDisabled: false
 
   actions:
     start: ->
@@ -45,6 +46,11 @@ App.BoxController = Em.ObjectController.extend
 
     togglePortForwarding: ->
       box = @get 'content'
+      box.toggleProperty 'forwardedPorts.enabled'
+      @set 'portForwardingTogglingDisabled', true
+      Em.run.later(=>
+        @set 'portForwardingTogglingDisabled', false
+      , 1000)
       false
 
     toggleFileSync: ->

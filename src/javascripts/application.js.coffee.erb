@@ -7,12 +7,16 @@
 #= require aio/aio
 #= require app
 
-gui = require 'nw.gui'
 appURL = location.origin + location.pathname
+console = window.console
+gui = require 'nw.gui'
 
-process.on 'uncaughtException', (err) ->
+uncaughtExceptionHandler = (err) ->
   console.log "Uncaught Exception: #{err.stack}"
   # TODO: airbrake
+
+if process.listeners('uncaughtException').indexOf(uncaughtExceptionHandler) == -1
+  process.on 'uncaughtException', uncaughtExceptionHandler
 
 window.NitrousIO = Em.Application.extend Ember.Evented,
   rootElement: "#app"
