@@ -49,21 +49,16 @@ div class={ :stack-image boxTemplate.runtime }
       .right.selectable
         = sshURI
 
-    .info-row.port-forwarding
+    .info-row.has-switch
       .left Port Forwarding
       .right
-        if forwardedPorts.enabled
-          button.btn.btn-white click='togglePortForwarding' Disable Port Forwarding
-        else
-          button.btn.btn-white click='togglePortForwarding' Enable Port Forwarding
+        = ui-switch preventFastToggling=true enabled=forwardedPorts.enabled
         App.EditableListView label="Port" contentBinding="forwardedPorts"
-    .info-row
+
+    .info-row.has-switch
       .left File Sync
       .right
-        if fileSync.enabled
-          button.btn.btn-white click='toggleFileSync' disabled={ fileSyncTogglingDisabled } Disable File Sync
-        else
-          button.btn.btn-white click='toggleFileSync' disabled={ fileSyncTogglingDisabled } Enable File Sync
+        = ui-switch preventFastToggling=true enabled=fileSync.enabled
 
     .info-row.box-access
       .left

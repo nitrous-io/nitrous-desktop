@@ -24,7 +24,7 @@ App.MainRoute = Em.Route.extend
   activate: ->
     win = gui.Window.get()
     win.hide()
-    App.windowHelper.resizeAndMoveToCenter(800, 450)
+    App.windowHelper.resizeAndMoveToCenter(800, 480)
     win.setResizable true
     win.show()
 

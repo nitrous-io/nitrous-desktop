@@ -43,21 +43,3 @@ App.BoxController = Em.ObjectController.extend
       box = @get 'content'
       gui.Shell.openExternal "ssh://action@#{@get 'host'}:#{@get 'port'}"
       false
-
-    togglePortForwarding: ->
-      box = @get 'content'
-      box.toggleProperty 'forwardedPorts.enabled'
-      @set 'portForwardingTogglingDisabled', true
-      Em.run.later(=>
-        @set 'portForwardingTogglingDisabled', false
-      , 1000)
-      false
-
-    toggleFileSync: ->
-      box = @get 'content'
-      box.toggleProperty 'fileSync.enabled'
-      @set 'fileSyncTogglingDisabled', true
-      Em.run.later(=>
-        @set 'fileSyncTogglingDisabled', false
-      , 1000)
-      false
