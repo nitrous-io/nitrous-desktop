@@ -12,9 +12,9 @@ SSH_BIN_PATH = path.join(appPath, 'programs',
 RETRY_DELAY = 10000 # milliseconds
 
 makeKey = (boxId) ->
-  "box:#{boxId}:forwardedPorts"
+  "box:#{boxId}:portForwarding"
 
-App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
+App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   content: Em.computed -> Em.A()
   box: null
   sortProperties: ['port']
@@ -27,7 +27,7 @@ App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
     return 0 if x == y
     if x < y then -1 else 1
 
-  forwardedPorts: (->
+  portForwarding: (->
     @get('arrangedContent').map (forwardedPort) ->
       forwardedPort.get 'port'
   ).property 'arrangedContent.[]'
@@ -50,7 +50,7 @@ App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
     if boxId = @get 'box.id'
       App.localStorage.set makeKey(boxId),
         enabled: @get 'enabled'
-        ports: @get 'forwardedPorts'
+        ports: @get 'portForwarding'
   ).observes 'enabled', 'arrangedContent.[]'
 
   _startOrStopPortForwarding: (->
@@ -79,7 +79,7 @@ App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
       "action@#{box.get 'host'}"
     ]
 
-    @get('forwardedPorts').forEach (port) ->
+    @get('portForwarding').forEach (port) ->
       args = args.concat ['-L', "#{port}/localhost/#{port}"]
 
     console.log SSH_BIN_PATH, args.join(' ')
@@ -92,16 +92,20 @@ App.ForwardedPorts = klass = Em.ArrayProxy.extend Em.SortableMixin,
       @set 'connected', false
 
   _stopPortForwarding: ->
-    console.log "Port Forwarding: stop #{@get 'box.name'}"
-    if retrySchedule = @get 'retrySchedule'
-      Em.run.cancel(retrySchedule)
-      @set 'retrySchedule', null
-    @_killProcess()
+    process = @get 'process'
+    retrySchedule = @get 'retrySchedule'
+    if process || retrySchedule
+      console.log "Port Forwarding: stop #{@get 'box.name'}"
+      if retrySchedule
+        Em.run.cancel(retrySchedule)
+        @set 'retrySchedule', null
+      if process
+        @_killProcess()
 
   _killProcess: ->
-    console.log 'Port Forwarding: killing process'
     @set 'connected', false
     if process = @get 'process'
+      console.log 'Port Forwarding: killing process'
       @set 'process', null
       process.kill()
 

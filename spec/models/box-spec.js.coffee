@@ -27,14 +27,14 @@ describe 'App.Box', ->
         box.restart()
         expect(box.makeRequest).to.have.been.calledWith 'restart', 'POST'
 
-  describe '#forwardedPorts', ->
-    forwardedPorts = null
+  describe '#portForwarding', ->
+    portForwarding = null
 
     beforeEach ->
-      forwardedPorts = App.ForwardedPorts.forBox(box)
+      portForwarding = App.PortForwarding.forBox(box)
 
-    it 'returns App.ForwardedPorts object for the box', ->
-      expect(box.get 'forwardedPorts').to.equal forwardedPorts
+    it 'returns App.PortForwarding object for the box', ->
+      expect(box.get 'portForwarding').to.equal portForwarding
 
   describe '#fileSync', ->
     fileSync = null

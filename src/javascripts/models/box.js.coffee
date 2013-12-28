@@ -28,18 +28,18 @@ App.Box = klass = App.BaseModel.extend
     @_super.apply this, arguments
     Em.run.next =>
       @get 'fileSync'
-      @get 'forwardedPorts'
+      @get 'portForwarding'
 
   didUnload: ->
     @set 'fileSync.enabled', false
-    @set 'forwardedPorts.enabled', false
+    @set 'portForwarding.enabled', false
 
   fileSync: (->
     App.FileSync.forBox(this) if @get 'id'
   ).property 'id'
 
-  forwardedPorts: (->
-    App.ForwardedPorts.forBox(this) if @get 'id'
+  portForwarding: (->
+    App.PortForwarding.forBox(this) if @get 'id'
   ).property 'id'
 
   ownBox: (->

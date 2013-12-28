@@ -1,5 +1,5 @@
-describe 'App.ForwardedPorts', ->
-  describedClass = App.ForwardedPorts
+describe 'App.PortForwarding', ->
+  describedClass = App.PortForwarding
 
   beforeEach ->
     describedClass._cache = {}
@@ -27,36 +27,36 @@ describe 'App.ForwardedPorts', ->
       subject = describedClass._create box: Em.Object.create(id: 123)
       subject.pushObject(App.ForwardedPort.create port: 3000)
       subject.pushObject(App.ForwardedPort.create port: 3500)
-      expect(App.localStorage.get('box:123:forwardedPorts').ports).to.deep.equal [3000, 3500]
+      expect(App.localStorage.get('box:123:portForwarding').ports).to.deep.equal [3000, 3500]
       subject.pushObject(App.ForwardedPort.create port: 4000)
       subject.pushObject(App.ForwardedPort.create port: 5000)
-      expect(App.localStorage.get('box:123:forwardedPorts').ports).to.deep.equal [3000, 3500, 4000, 5000]
+      expect(App.localStorage.get('box:123:portForwarding').ports).to.deep.equal [3000, 3500, 4000, 5000]
 
   context 'when enabled property is changed', ->
     it 'saves the value to local storage', ->
       subject = describedClass._create box: Em.Object.create(id:123)
       subject.set 'enabled', true
-      expect(App.localStorage.get('box:123:forwardedPorts').enabled).to.be.true
+      expect(App.localStorage.get('box:123:portForwarding').enabled).to.be.true
       subject.set 'enabled', false
-      expect(App.localStorage.get('box:123:forwardedPorts').enabled).to.be.false
+      expect(App.localStorage.get('box:123:portForwarding').enabled).to.be.false
 
   describe '.forBox', ->
     context 'when it does not exist in the local storage', ->
-      it 'creates a new instance of App.ForwardedPorts', ->
+      it 'creates a new instance of App.PortForwarding', ->
         mockBox = Em.Object.create id: 9999
         obj = describedClass.forBox(mockBox)
-        expect(obj).to.be.an.instanceOf App.ForwardedPorts
+        expect(obj).to.be.an.instanceOf App.PortForwarding
         expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'content').to.deep.equal []
 
     context 'when it exists in the local storage', ->
       beforeEach ->
-        App.localStorage.set 'box:111:forwardedPorts', { ports: [3100, 3200, 4000], enabled: true }
+        App.localStorage.set 'box:111:portForwarding', { ports: [3100, 3200, 4000], enabled: true }
 
       it 'loads it', ->
         mockBox = Em.Object.create id: 111
         obj = describedClass.forBox(mockBox)
-        expect(obj).to.be.an.instanceOf App.ForwardedPorts
+        expect(obj).to.be.an.instanceOf App.PortForwarding
         expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'enabled').to.be.true
         expect(obj.get 'length').to.equal 3
@@ -69,12 +69,12 @@ describe 'App.ForwardedPorts', ->
 
     context 'when it is already loaded', ->
       beforeEach ->
-        App.localStorage.set 'box:222:forwardedPorts', { ports: [3000, 3200, 4300], enabled: false }
+        App.localStorage.set 'box:222:portForwarding', { ports: [3000, 3200, 4300], enabled: false }
 
       it 'loads the cached object', ->
         mockBox = Em.Object.create id: 222
         obj = describedClass.forBox(mockBox)
-        expect(obj).to.be.an.instanceOf App.ForwardedPorts
+        expect(obj).to.be.an.instanceOf App.PortForwarding
         expect(obj.get 'box').to.equal mockBox
         expect(obj.get 'enabled').to.be.false
         expect(obj.get 'length').to.equal 3

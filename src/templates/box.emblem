@@ -52,8 +52,8 @@ div class={ :stack-image boxTemplate.runtime }
     .info-row.has-switch
       .left Port Forwarding
       .right
-        = ui-switch preventFastToggling=true enabled=forwardedPorts.enabled
-        App.EditableListView label="Port" contentBinding="forwardedPorts"
+        = ui-switch preventFastToggling=true enabled=portForwarding.enabled
+        App.EditableListView label="Port" contentBinding="portForwarding"
 
     .info-row.has-switch
       .left File Sync
