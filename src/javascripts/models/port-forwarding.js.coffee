@@ -28,7 +28,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     return 0 if x == y
     if x < y then -1 else 1
 
-  portForwarding: (->
+  forwardedPorts: (->
     @get('arrangedContent').map (forwardedPort) ->
       forwardedPort.get 'port'
   ).property 'arrangedContent.[]'
@@ -46,6 +46,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       'connected'
     else if @get 'connecting'
       'connecting'
+    else
+      'disconnected'
   ).property 'enabled', 'connected', 'connecting', 'lastErrorMessage'
 
   stateDescription: (->
@@ -58,6 +60,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
         'Connected'
       when 'connecting'
         'Connecting...'
+      when 'disconnected'
+        'Disconnected'
   ).property 'state', 'lastErrorMessage'
 
   add: (input) ->
@@ -74,8 +78,14 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     if boxId = @get 'box.id'
       App.localStorage.set makeKey(boxId),
         enabled: @get 'enabled'
-        ports: @get 'portForwarding'
-  ).observes 'enabled', 'arrangedContent.[]'
+        ports: @get 'forwardedPorts'
+  ).observes 'enabled'
+
+  _forwardedPortsDidChange: (->
+    @save()
+    if @get('process')
+      @_scheduleRetry(1000)
+  ).observes 'arrangedContent.[]'
 
   _startOrStopPortForwarding: (->
     if @get('enabled') && @get('box.state') == 'running'
@@ -104,7 +114,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       "action@#{box.get 'host'}"
     ]
 
-    @get('portForwarding').forEach (port) ->
+    @get('forwardedPorts').forEach (port) ->
       args = args.concat ['-L', "#{port}/localhost/#{port}"]
 
     console.log SSH_BIN_PATH, args.join(' ')
@@ -128,6 +138,10 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       if process
         @_killProcess()
 
+  _restartPortForwarding: ->
+    @_stopPortForwarding()
+    @_startPortForwarding()
+
   _killProcess: ->
     @set 'connected', false
     if process = @get 'process'
@@ -135,14 +149,14 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       @set 'process', null
       process.kill()
 
-  _scheduleRetry: ->
+  _scheduleRetry: (delay) ->
     @_killProcess()
     if @get('retrySchedule') == null
       @set 'retrySchedule', Em.run.later(=>
         @set 'retrySchedule', null
         console.log 'Port Forwarding: retrying...'
         @_startPortForwarding()
-      , RETRY_DELAY)
+      , delay ? RETRY_DELAY)
 
   _processOutput: (data) ->
     data = data.toString('utf8')
