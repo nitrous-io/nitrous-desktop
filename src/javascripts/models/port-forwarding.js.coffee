@@ -24,6 +24,11 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   lastErrorMessage: null
   retrySchedule: null
 
+  init: ->
+    @_super.apply this, arguments
+    Em.run.next =>
+      @_startOrStopPortForwarding()
+
   sortFunction: (x, y) ->
     return 0 if x == y
     if x < y then -1 else 1
