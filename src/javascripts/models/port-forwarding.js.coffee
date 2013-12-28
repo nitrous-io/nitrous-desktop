@@ -203,3 +203,8 @@ klass.reopenClass
       klass._create box: box, content: ports, enabled: settings.enabled
     else
       klass._create box: box
+
+  killAll: (cb) ->
+    childProcess.execFile '/usr/bin/killall', ['-9', 'nitrous-ssh'], {}, cb
+
+klass.killAll()
