@@ -16,10 +16,11 @@ makeKey = (boxId) ->
 
 App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   content: Em.computed -> Em.A()
-  box: null
   sortProperties: ['port']
-  process: null
+  box: null
+  enabled: false
   connected: false
+  process: null
   lastErrorMessage: null
   retrySchedule: null
 
@@ -35,6 +36,29 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   connecting: (->
     @get('process')? && !@get('connected')
   ).property 'connected', 'process'
+
+  state: (->
+    if !@get 'enabled'
+      'disabled'
+    else if @get 'lastErrorMessage'
+      'error'
+    else if @get 'connected'
+      'connected'
+    else if @get 'connecting'
+      'connecting'
+  ).property 'enabled', 'connected', 'connecting', 'lastErrorMessage'
+
+  stateDescription: (->
+    switch @get 'state'
+      when 'disabled'
+        'Disabled'
+      when 'error'
+        "Error: #{@get 'lastErrorMessage'}"
+      when 'connected'
+        'Connected'
+      when 'connecting'
+        'Connecting...'
+  ).property 'state', 'lastErrorMessage'
 
   add: (input) ->
     list = @get 'content'
@@ -61,6 +85,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   ).observes 'enabled', 'box.state'
 
   _startPortForwarding: ->
+    @set 'lastErrorMessage', null
     box = @get 'box'
     console.log "Port Forwarding: start #{box.get 'name'}"
 
@@ -92,6 +117,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       @set 'connected', false
 
   _stopPortForwarding: ->
+    @set 'lastErrorMessage', null
     process = @get 'process'
     retrySchedule = @get 'retrySchedule'
     if process || retrySchedule
@@ -123,7 +149,6 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     console.log data
     if match = data.match /^debug1: Entering interactive session\./m
       @set 'connected', true
-      @set 'lastErrorMessage', null
     else
       if match = data.match /^channel_setup_fwd_listener: cannot listen to port: (\d+)/m
         @set 'lastErrorMessage', "Port #{match[1]} is already in use"
@@ -135,6 +160,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
         @set 'lastErrorMessage', 'Could not reach host'
       else if match = data.match /: Operation timed out/m
         @set 'lastErrorMessage', 'Connection timed out'
+      else if match = data.match /: Connection refused/m
+        @set 'lastErrorMessage', 'Connection refused'
       else if match = data.match /Timeout, server/m
         @set 'lastErrorMessage', 'Connection timed out'
       else if match = data.match /^Write failed: Broken pipe/m

@@ -52,7 +52,12 @@ div class={ :stack-image boxTemplate.runtime }
     .info-row.has-switch
       .left Port Forwarding
       .right
-        = ui-switch preventFastToggling=true enabled=portForwarding.enabled
+        .switch-with-state
+          = ui-switch preventFastToggling=true enabled=portForwarding.enabled
+          .state
+            div class={:state-orb portForwarding.state}
+            span
+              = portForwarding.stateDescription
         App.EditableListView label="Port" contentBinding="portForwarding"
 
     .info-row.has-switch

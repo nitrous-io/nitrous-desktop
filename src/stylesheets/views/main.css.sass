@@ -43,6 +43,9 @@
           overflow: hidden
           text-overflow: ellipsis
 
+          .state-orb
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7)
+
           &.selected
             padding-top: 0
             padding-bottom: 0
@@ -86,18 +89,17 @@
     border: 1px solid #d2c300
     background: #f5e632
     border-radius: 5px
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7)
     vertical-align: -1px
 
-    &.running
+    &.running, &.connected
       border-color: #a3bd4a
       background: #b4e123
 
-    &.stopped
+    &.stopped, &.error
       border-color: #d55756
       background: #ff7c7c
 
-    &.terminated
+    &.terminated, &.disabled
       border-color: #a4a4a4
       background: #c8c8c8
 
