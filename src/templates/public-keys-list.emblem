@@ -1,7 +1,5 @@
 h3 Public Keys
-button.refresh href='#'
-  i.icon-refresh
-  span refresh
+= ui-reload content=content
 ul
   each arrangedContent
     App.PublicKeysListItemView

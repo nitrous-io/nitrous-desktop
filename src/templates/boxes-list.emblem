@@ -1,7 +1,5 @@
 h3 Boxes
-button.refresh
-  i.icon-refresh
-  span Refresh
+= ui-reload content=content
 ul
   each arrangedContent
     App.BoxesListItemView
