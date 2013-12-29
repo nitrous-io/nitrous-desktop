@@ -19,6 +19,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   sortProperties: ['port']
   box: null
   enabled: false
+  started: false
   connected: false
   process: null
   lastErrorMessage: null
@@ -39,8 +40,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   ).property 'arrangedContent.[]'
 
   connecting: (->
-    @get('process')? && !@get('connected')
-  ).property 'connected', 'process'
+    @get('started') && @get('process')? && !@get('connected')
+  ).property 'started', 'connected', 'process'
 
   state: (->
     if !@get 'enabled'
@@ -101,6 +102,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
 
   _startPortForwarding: ->
     @set 'lastErrorMessage', null
+    return if @get 'started'
+    @set 'started', true
     box = @get 'box'
     console.log "Port Forwarding: start #{box.get 'name'}"
 
@@ -143,16 +146,13 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       if process
         @_killProcess()
 
-  _restartPortForwarding: ->
-    @_stopPortForwarding()
-    @_startPortForwarding()
-
   _killProcess: ->
     @set 'connected', false
     if process = @get 'process'
       console.log 'Port Forwarding: killing process'
       @set 'process', null
       process.kill()
+    @set 'started', false
 
   _scheduleRetry: (delay) ->
     @_killProcess()

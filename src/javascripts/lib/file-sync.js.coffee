@@ -20,6 +20,7 @@ makeKey = (boxId) ->
 App.FileSync = klass = Em.Object.extend
   box: null
   enabled: false
+  started: false
   syncing: false
   watcher: null
   shouldSyncAgain: false
@@ -80,6 +81,8 @@ App.FileSync = klass = Em.Object.extend
 
   _startWatching: ->
     @set 'lastErrorMessage', null
+    return if @get 'started'
+    @set 'started', true
     boxName = @get 'box.name'
     boxPath = path.join nitrousPath, boxName
     console.log "File Sync: start watching #{boxName} - #{boxPath}"
@@ -103,6 +106,7 @@ App.FileSync = klass = Em.Object.extend
       console.log "File Sync: stop watching #{boxName} - #{boxPath}"
       watcher.stop()
       @set 'watcher', null
+    @set 'started', false
 
   performSync: (cb) ->
     @set 'lastErrorMessage', null
