@@ -69,6 +69,10 @@ div class={ :stack-image boxTemplate.runtime }
             div class={:state-orb fileSync.state}
             span
               = fileSync.stateDescription
+        if fileSync.enabled
+          button.btn.btn-white click='syncNow' disabled={ fileSync.syncing } Sync Now
+        else
+          button.btn.btn-white disabled="disabled" Sync Now
 
     .info-row.box-access
       .left

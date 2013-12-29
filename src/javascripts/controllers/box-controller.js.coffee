@@ -29,6 +29,10 @@ App.BoxController = Em.ObjectController.extend
       box.restart()
       false
 
+    syncNow: ->
+      fileSync = @get 'content.fileSync'
+      fileSync.performSync()
+
     ide: ->
       App.get('currentUser').getSignInToken().then (signInToken) =>
         gui.Shell.openExternal @makeSignInURI("/app#/boxes/#{@get 'id'}/ide", signInToken)

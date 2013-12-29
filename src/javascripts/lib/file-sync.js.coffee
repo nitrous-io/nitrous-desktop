@@ -87,9 +87,9 @@ App.FileSync = klass = Em.Object.extend
       fs.mkdir boxPath, '0755', (err) =>
         @set 'watcher', watcher = new App.Watcher(nitrousPath)
         watcher.on 'change', =>
-          @_performSync()
+          @performSync()
         # perform initial sync
-        @_performSync =>
+        @performSync =>
           watcher.start()
 
   _stopWatching: ->
@@ -104,7 +104,7 @@ App.FileSync = klass = Em.Object.extend
       watcher.stop()
       @set 'watcher', null
 
-  _performSync: (cb) ->
+  performSync: (cb) ->
     @set 'lastErrorMessage', null
     if @get 'syncing'
       console.log 'File Sync: already syncing, will run sync again'
@@ -177,14 +177,14 @@ App.FileSync = klass = Em.Object.extend
     cb?()
     if @get 'shouldSyncAgain'
       @set 'shouldSyncAgain', false
-      @_performSync()
+      @performSync()
 
   _scheduleRetry: (delay) ->
     if @get('retrySchedule') == null
       @set 'retrySchedule', Em.run.later(=>
         @set 'retrySchedule', null
         console.log 'File Sync: retrying...'
-        @_performSync()
+        @performSync()
       , delay ? RETRY_DELAY)
 
 klass._create = klass.create
