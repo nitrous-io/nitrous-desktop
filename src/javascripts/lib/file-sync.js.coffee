@@ -24,12 +24,40 @@ App.FileSync = klass = Em.Object.extend
   watcher: null
   shouldSyncAgain: false
   shouldIgnoreArchives: false
+  lastErrorMessage: null
   retrySchedule: null
 
   init: ->
     @_super.apply this, arguments
     Em.run.next =>
       @_startOrStopWatching()
+
+  state: (->
+    if !@get 'enabled'
+      'disabled'
+    else if @get 'lastErrorMessage'
+      'error'
+    else if @get 'syncing'
+      'syncing'
+    else if @get 'watcher'
+      'monitoring'
+    else
+      'disconnected'
+  ).property 'enabled', 'watcher', 'syncing', 'lastErrorMessage'
+
+  stateDescription: (->
+    switch @get 'state'
+      when 'disabled'
+        'Disabled'
+      when 'error'
+        "Error: #{@get 'lastErrorMessage'}"
+      when 'syncing'
+        'Syncing...'
+      when 'monitoring'
+        'Monitoring'
+      when 'disconnected'
+        'Disconnected'
+  ).property 'state', 'lastErrorMessage'
 
   save: (->
     if boxId = @get 'box.id'
@@ -51,6 +79,7 @@ App.FileSync = klass = Em.Object.extend
   ).observes 'enabled', 'box.state'
 
   _startWatching: ->
+    @set 'lastErrorMessage', null
     boxName = @get 'box.name'
     boxPath = path.join nitrousPath, boxName
     console.log "File Sync: start watching #{boxName} - #{boxPath}"
@@ -64,6 +93,7 @@ App.FileSync = klass = Em.Object.extend
           watcher.start()
 
   _stopWatching: ->
+    @set 'lastErrorMessage', null
     if retrySchedule = @get 'retrySchedule'
       Em.run.cancel(retrySchedule)
       @set 'retrySchedule', null
@@ -75,6 +105,7 @@ App.FileSync = klass = Em.Object.extend
       @set 'watcher', null
 
   _performSync: (cb) ->
+    @set 'lastErrorMessage', null
     if @get 'syncing'
       console.log 'File Sync: already syncing, will run sync again'
       @set 'shouldSyncAgain', true
@@ -125,12 +156,17 @@ App.FileSync = klass = Em.Object.extend
     errorMessage = stderr.match(/[Ee]rror:\s*(.+)$/m)?[1]
     if err
       console.log "File Sync: error! code: #{err.code}, killed: #{err.killed}, signal: #{err.signal}"
-      if errorMessage &&
-         (errorMessage.indexOf('Warning: inconsistent state.') != -1 ||
-          errorMessage.indexOf('on-disk archives are not identical') != -1)
-        @set 'shouldIgnoreArchives', true
-      console.log 'File Sync: schedule retry'
-      @_scheduleRetry()
+      if errorMessage
+        if errorMessage.indexOf('Warning: inconsistent state.') != -1 ||
+           errorMessage.indexOf('on-disk archives are not identical') != -1
+          @set 'lastErrorMessage', 'Inconsistent state'
+          @set 'shouldIgnoreArchives', true
+          @_scheduleRetry(1000)
+        else if errorMessage.indexOf('Lost connection with the server') != -1
+          @set 'lastErrorMessage', 'Connection lost'
+          @_scheduleRetry()
+      else
+        @_scheduleRetry()
     else
       if transferCount = stderr.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
         transferCount = window.parseInt(transferCount.replace(/,/g, ''), 10)
@@ -143,13 +179,13 @@ App.FileSync = klass = Em.Object.extend
       @set 'shouldSyncAgain', false
       @_performSync()
 
-  _scheduleRetry: ->
+  _scheduleRetry: (delay) ->
     if @get('retrySchedule') == null
       @set 'retrySchedule', Em.run.later(=>
         @set 'retrySchedule', null
         console.log 'File Sync: retrying...'
         @_performSync()
-      , RETRY_DELAY)
+      , delay ? RETRY_DELAY)
 
 klass._create = klass.create
 klass.create = undefined

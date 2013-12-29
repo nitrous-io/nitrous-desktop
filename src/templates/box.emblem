@@ -63,7 +63,12 @@ div class={ :stack-image boxTemplate.runtime }
     .info-row.has-switch
       .left File Sync
       .right
-        = ui-switch preventFastToggling=true enabled=fileSync.enabled
+        .switch-with-state
+          = ui-switch preventFastToggling=true enabled=fileSync.enabled
+          .state
+            div class={:state-orb fileSync.state}
+            span
+              = fileSync.stateDescription
 
     .info-row.box-access
       .left
