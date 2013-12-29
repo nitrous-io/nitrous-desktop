@@ -1,5 +1,5 @@
 h3 Public Keys
-= ui-reload content=content
+= ui-reload content=content disabled=App.offline
 ul
   each arrangedContent
     App.PublicKeysListItemView

@@ -1,7 +1,9 @@
 App.UiReloadComponent = Em.Component.extend
   classNames: ['ui-reload']
   classNameBindings: ['reloading']
+  attributeBindings: ['disabled']
   reloading: false
+  disabled: false
   tagName: 'button'
 
   content: null

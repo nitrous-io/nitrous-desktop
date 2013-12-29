@@ -36,6 +36,8 @@ App.FileSync = klass = Em.Object.extend
   state: (->
     if !@get 'enabled'
       'disabled'
+    else if App.get 'offline'
+      'offline'
     else if @get 'lastErrorMessage'
       'error'
     else if @get 'syncing'
@@ -44,12 +46,14 @@ App.FileSync = klass = Em.Object.extend
       'monitoring'
     else
       'disconnected'
-  ).property 'enabled', 'watcher', 'syncing', 'lastErrorMessage'
+  ).property 'enabled', 'watcher', 'syncing', 'lastErrorMessage', 'App.offline'
 
   stateDescription: (->
     switch @get 'state'
       when 'disabled'
         'Disabled'
+      when 'offline'
+        'No Internet connection'
       when 'error'
         "Error: #{@get 'lastErrorMessage'}"
       when 'syncing'
@@ -67,7 +71,7 @@ App.FileSync = klass = Em.Object.extend
   ).observes 'enabled'
 
   _startOrStopWatching: (->
-    if @get('enabled') && @get('box.state') == 'running'
+    if @get('enabled') && (@get('box.state') == 'running') && App.get('online')
       if nitrousPath
         @_startWatching()
       else
@@ -77,7 +81,7 @@ App.FileSync = klass = Em.Object.extend
           @_startWatching()
     else
       @_stopWatching()
-  ).observes 'enabled', 'box.state'
+  ).observes 'enabled', 'box.state', 'App.online'
 
   _startWatching: ->
     @set 'lastErrorMessage', null

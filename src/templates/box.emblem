@@ -10,18 +10,22 @@ div class={ :stack-image boxTemplate.runtime }
   .info-row
     .left State
     .right
-      = state
+      if App.online
+        = state
+      else
+        | Unknown
 
   if ownBox
     .info-row.box-control-row
       .left
       .right
-        if running
-          button.btn.btn-white click='stop' Shut Down
-          button.btn.btn-white click='restart' Restart
-        else
-          if stopped
-            button.btn.btn-white click='start' Start
+        if App.online
+          if running
+            button.btn.btn-white click='stop' Shut Down
+            button.btn.btn-white click='restart' Restart
+          else
+            if stopped
+              button.btn.btn-white click='start' Start
 
   .info-row
     .left Memory
@@ -44,39 +48,40 @@ div class={ :stack-image boxTemplate.runtime }
       | {{ version }} - {{ boxTemplate.name }}
 
   if running
-    .info-row
-      .left SSH URI
-      .right.selectable
-        = sshURI
+    if App.online
+      .info-row
+        .left SSH URI
+        .right.selectable
+          = sshURI
 
-    .info-row.has-switch
-      .left Port Forwarding
-      .right
-        .switch-with-state
-          = ui-switch preventFastToggling=true enabled=portForwarding.enabled
-          .state
-            div class={:state-orb portForwarding.state}
-            span
-              = portForwarding.stateDescription
-        App.EditableListView label="Port" contentBinding="portForwarding"
+      .info-row.has-switch
+        .left Port Forwarding
+        .right
+          .switch-with-state
+            = ui-switch preventFastToggling=true enabled=portForwarding.enabled
+            .state
+              div class={:state-orb portForwarding.state}
+              span
+                = portForwarding.stateDescription
+          App.EditableListView label="Port" contentBinding="portForwarding"
 
-    .info-row.has-switch
-      .left File Sync
-      .right
-        .switch-with-state
-          = ui-switch preventFastToggling=true enabled=fileSync.enabled
-          .state
-            div class={:state-orb fileSync.state}
-            span
-              = fileSync.stateDescription
-        if fileSync.enabled
-          button.btn.btn-white click='syncNow' disabled={ fileSync.syncing } Sync Now
-        else
-          button.btn.btn-white disabled="disabled" Sync Now
+      .info-row.has-switch
+        .left File Sync
+        .right
+          .switch-with-state
+            = ui-switch preventFastToggling=true enabled=fileSync.enabled
+            .state
+              div class={:state-orb fileSync.state}
+              span
+                = fileSync.stateDescription
+          if fileSync.enabled
+            button.btn.btn-white click='syncNow' disabled={ fileSync.syncing } Sync Now
+          else
+            button.btn.btn-white disabled="disabled" Sync Now
 
-    .info-row.box-access
-      .left
-      .right
-        button.btn.btn-white click='ide' IDE
-        button.btn.btn-white click='terminal' Terminal
-        button.btn.btn-white click='ssh' SSH
+      .info-row.box-access
+        .left
+        .right
+          button.btn.btn-white click='ide' IDE
+          button.btn.btn-white click='terminal' Terminal
+          button.btn.btn-white click='ssh' SSH

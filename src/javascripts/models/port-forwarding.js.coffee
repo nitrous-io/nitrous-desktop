@@ -46,6 +46,8 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   state: (->
     if !@get 'enabled'
       'disabled'
+    else if App.get 'offline'
+      'offline'
     else if @get 'lastErrorMessage'
       'error'
     else if @get 'connected'
@@ -54,12 +56,14 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       'connecting'
     else
       'disconnected'
-  ).property 'enabled', 'connected', 'connecting', 'lastErrorMessage'
+  ).property 'enabled', 'connected', 'connecting', 'lastErrorMessage', 'App.offline'
 
   stateDescription: (->
     switch @get 'state'
       when 'disabled'
         'Disabled'
+      when 'offline'
+        'No Internet connection'
       when 'error'
         "Error: #{@get 'lastErrorMessage'}"
       when 'connected'
@@ -94,11 +98,11 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   ).observes 'arrangedContent.[]'
 
   _startOrStopPortForwarding: (->
-    if @get('enabled') && @get('box.state') == 'running'
+    if @get('enabled') && (@get('box.state') == 'running') && App.get('online')
       @_startPortForwarding()
     else
       @_stopPortForwarding()
-  ).observes 'enabled', 'box.state'
+  ).observes 'enabled', 'box.state', 'App.online'
 
   _startPortForwarding: ->
     @set 'lastErrorMessage', null
