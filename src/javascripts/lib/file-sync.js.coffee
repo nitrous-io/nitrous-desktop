@@ -170,8 +170,11 @@ App.FileSync = klass = Em.Object.extend
           @set 'lastErrorMessage', 'Inconsistent state'
           @set 'shouldIgnoreArchives', true
           @_scheduleRetry(1000)
+        else if stderr.indexOf('Permission denied (publickey)') != -1
+          @set 'lastErrorMessage', 'Authentication failed'
+          @_scheduleRetry()
         else if errorMessage.indexOf('Lost connection with the server') != -1
-          @set 'lastErrorMessage', 'Connection lost'
+          @set 'lastErrorMessage', 'Connection failed'
           @_scheduleRetry()
       else
         @_scheduleRetry()

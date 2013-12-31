@@ -175,20 +175,16 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     else
       if match = data.match /^channel_setup_fwd_listener: cannot listen to port: (\d+)/m
         @set 'lastErrorMessage', "Port #{match[1]} is already in use"
-      else if match = data.match /^Permission denied \(publickey\)/m
-        @set 'lastErrorMessage', 'Could not authenticate'
-      else if match = data.match /: Could not resolve hostname/m
-        @set 'lastErrorMessage', 'Could not resolve hostname'
-      else if match = data.match /Host is down/m
-        @set 'lastErrorMessage', 'Could not reach host'
-      else if match = data.match /: Operation timed out/m
-        @set 'lastErrorMessage', 'Connection timed out'
-      else if match = data.match /: Connection refused/m
-        @set 'lastErrorMessage', 'Connection refused'
-      else if match = data.match /Timeout, server/m
-        @set 'lastErrorMessage', 'Connection timed out'
-      else if match = data.match /^Write failed: Broken pipe/m
-        @set 'lastErrorMessage', 'Connection lost'
+      else if match = data.indexOf('Permission denied (publickey)') != -1
+        @set 'lastErrorMessage', 'Authentication failed'
+      else if match = (data.indexOf(': Could not resolve hostname') != -1 ||
+                       data.indexOf(': Operation timed out')        != -1 ||
+                       data.indexOf(': Connection refused')         != -1 ||
+                       data.indexOf(': Network is unreachable')     != -1 ||
+                       data.indexOf('Host is down')                 != -1 ||
+                       data.indexOf('Timeout, server')              != -1 ||
+                       data.indexOf('Write failed: Broken pipe')    != -1)
+        @set 'lastErrorMessage', 'Connection failed'
 
       if match
         @_scheduleRetry()
