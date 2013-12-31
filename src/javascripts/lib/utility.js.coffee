@@ -1,6 +1,9 @@
+gui = require 'nw.gui'
 path = require 'path'
 os = require 'os'
 childProcess = require 'child_process'
+
+SIGN_IN_URI_FORMAT = '%@/users/sign_in_with_token?sign_in_token=%@&redirect_to=%@'
 
 App.utility =
   isWindowsXP: ->
@@ -16,3 +19,12 @@ App.utility =
           cb?(stdout.match(/Personal\s+REG_SZ\s+([^\r\n]+)/)[1])
     else
       cb?(process.env.USERPROFILE)
+
+  openWebsitePath: (path) ->
+    if currentUser = App.get('currentUser')
+      currentUser.getSignInToken().then (signInToken) =>
+        gui.Shell.openExternal Em.String.fmt(SIGN_IN_URI_FORMAT, [
+          App.get('config.host')
+          window.encodeURIComponent(signInToken)
+          window.encodeURIComponent(path)
+        ])

@@ -1,15 +1,6 @@
 gui = require 'nw.gui'
 
-SIGN_IN_URI_FORMAT = '%@/users/sign_in_with_token?sign_in_token=%@&redirect_to=%@'
-
 App.BoxController = Em.ObjectController.extend
-  makeSignInURI: (path, signInToken) ->
-    Em.String.fmt SIGN_IN_URI_FORMAT, [
-      App.get('config.host')
-      window.encodeURIComponent(signInToken)
-      window.encodeURIComponent(path)
-    ]
-
   fileSyncTogglingDisabled: false
   portForwardingTogglingDisabled: false
 
@@ -34,13 +25,11 @@ App.BoxController = Em.ObjectController.extend
       fileSync.performSync()
 
     ide: ->
-      App.get('currentUser').getSignInToken().then (signInToken) =>
-        gui.Shell.openExternal @makeSignInURI("/app#/boxes/#{@get 'id'}/ide", signInToken)
+      App.utility.openWebsitePath "/app#/boxes/#{@get 'id'}/ide"
       false
 
     terminal: ->
-      App.get('currentUser').getSignInToken().then (signInToken) =>
-        gui.Shell.openExternal @makeSignInURI("/app#/boxes/#{@get 'id'}/terminal", signInToken)
+      App.utility.openWebsitePath "/app#/boxes/#{@get 'id'}/terminal"
       false
 
     ssh: ->
