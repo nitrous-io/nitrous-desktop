@@ -7,3 +7,6 @@
 #= require_tree ./routes
 #= require router
 #= require_self
+
+# all classes are loaded
+App.trigger 'AppDidLoad'

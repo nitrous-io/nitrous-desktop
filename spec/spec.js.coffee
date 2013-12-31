@@ -16,7 +16,8 @@ $('#debug .devtools').click ->
   false
 
 $('#debug .reload').click ->
-  win.reloadIgnoringCache()
+  App.cleanUp ->
+    win.reloadIgnoringCache()
   false
 
 window.nodeRequire = window.require

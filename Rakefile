@@ -5,7 +5,7 @@ require 'logger'
 require 'pathname'
 require 'json'
 
-NODE_WEBKIT_VERSION = '0.8.2'
+NODE_WEBKIT_VERSION = '0.8.4'
 ROOT_DIR = File.expand_path(File.dirname(__FILE__))
 LOGGER = Logger.new(STDOUT)
 BUILD_DIR = "build"
@@ -37,7 +37,9 @@ task :setup do |t|
   Dir.chdir 'node-webkit' do
     filename = "node-webkit-v#{NODE_WEBKIT_VERSION}-osx-ia32.zip"
     execute 'curl', "https://s3.amazonaws.com/node-webkit/v#{NODE_WEBKIT_VERSION}/#{filename}", '-o', filename
-    execute 'unzip', filename
+    FileUtils.mkdir_p NODE_WEBKIT_VERSION
+    execute 'unzip', filename, '-d', NODE_WEBKIT_VERSION
+    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents')
   end
   puts "=> Compiling FSEvents native module..."
   Dir.chdir File.join(VENDOR_DIR, 'fsevents') do
@@ -47,18 +49,13 @@ task :setup do |t|
   puts "=> Done!"
 end
 
-desc "Build FSEvents"
-task :build_fsevents do |t|
-
-end
-
 desc 'Run app'
 task :run do |t|
   if ENV['NO_BUILD'] != '1'
     Rake::Task["build"].invoke
   end
   puts "=> Running #{@target}..."
-  execute 'node-webkit/node-webkit.app/Contents/MacOS/node-webkit', File.join(BUILD_DIR, @target)
+  execute "node-webkit/#{NODE_WEBKIT_VERSION}/node-webkit.app/Contents/MacOS/node-webkit", File.join(BUILD_DIR, @target)
 end
 
 desc 'Watch for changes'

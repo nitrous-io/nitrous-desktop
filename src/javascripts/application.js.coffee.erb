@@ -4,12 +4,14 @@
 #= require ember-model/ember-model-0.0.10
 #= require bootstrap3/js/bootstrap
 #= require_self
+#= require debug
 #= require aio/aio
 #= require app
 
 appURL = location.origin + location.pathname
 console = window.console
 gui = require 'nw.gui'
+win = gui.Window.get()
 
 uncaughtExceptionHandler = (err) ->
   console.log "Uncaught Exception: #{err.stack}"
@@ -18,20 +20,21 @@ uncaughtExceptionHandler = (err) ->
 if process.listeners('uncaughtException').indexOf(uncaughtExceptionHandler) == -1
   process.on 'uncaughtException', uncaughtExceptionHandler
 
-window.NitrousIO = Em.Application.extend Ember.Evented,
+window.NitrousDesktop = Em.Application.extend Ember.Evented,
   rootElement: "#app"
   online: navigator.onLine
   offline: Em.computed.not 'online'
   accessToken: null
   currentUser: null
+  trayMenu: null
 
   reset: ->
     @setProperties
       currentUser: null
       accessToken: null
-    @_super()
+    @_super.apply this, arguments
 
-window.App = NitrousIO.create
+window.App = NitrousDesktop.create
   config:
     environment: "<%= config['environment'] %>"
     appName: "<%= config['app_name'] %>"
@@ -42,13 +45,36 @@ window.App = NitrousIO.create
     clientSecret: "<%= config['client_secret'] %>"
     shoverServerURI: "<%= config['shover_server_uri'] %>"
 
+  cleanUp: (cb) ->
+    if trayMenu = @get 'trayMenu'
+      trayMenu.hide()
+      @set 'trayMenu', null
+    App.Watcher.stopAll()
+    App.PortForwarding.killAll ->
+      App.FileSync.killAll ->
+        cb?()
+
+  clearAccessTokenAndRestart: ->
+    App.AccessToken.removeFromStorage()
+    gui.Window.open appURL,
+      show: false
+      toolbar: false
+      focus: true
+    @quit()
+
+  quit: ->
+    win.hide()
+    App.cleanUp =>
+      win.close(true)
+
 $(window).on 'online', ->
   App.set 'online', true
 
 $(window).on 'offline', ->
   App.set 'online', false
 
-win = gui.Window.get()
+win.setAlwaysOnTop(true)
+
 $html = $('html')
 
 win.on 'focus', ->
@@ -57,44 +83,17 @@ win.on 'focus', ->
 win.on 'blur', ->
   $html.addClass 'blurred'
 
-cleanup = (cb) ->
-  App.Watcher.stopAll()
-  App.PortForwarding.killAll ->
-    App.FileSync.killAll ->
-      cb?()
+win.on 'close', (kind) ->
+  if kind == 'quit'
+    App.quit()
+  else
+    win.hide()
 
-win.on 'close', ->
-  @hide()
-  cleanup =>
-    @close(true)
-
-if App.get('config.environment') == 'development'
-  $('#debug').show()
-  $('#debug .devtools').click ->
-    win.showDevTools()
-    false
-  $('#debug .reload').click ->
-    cleanup ->
-      win.reloadIgnoringCache()
-    false
-  $('#debug .spec').click ->
-    gui.Window.open location.href.replace(/index\.html.*/, 'spec/spec.html'),
-      position: 'center'
-      width: 1024
-      height: 768
-      toolbar: false
-    false
-
-clearAccessTokenAndRestart = ->
-  App.AccessToken.removeFromStorage()
-  gui.Window.open appURL,
-    show: false
-    toolbar: false
-    focus: true
-  win.close()
+App.on 'AppDidLoad', ->
+  App.set 'trayMenu', App.TrayMenu.create()
 
 App.on 'InvalidAccessToken', ->
-  clearAccessTokenAndRestart()
+  App.clearAccessTokenAndRestart()
 
 App.on 'SignOut', ->
-  clearAccessTokenAndRestart()
+  App.clearAccessTokenAndRestart()

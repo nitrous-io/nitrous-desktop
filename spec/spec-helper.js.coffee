@@ -71,7 +71,16 @@ gui = require 'nw.gui'
 win = gui.Window.get()
 win.show()
 
-window.reset = ->
+stub = ->
+  sinon.stub win, 'resizeTo'
+  sinon.stub win, 'setResizable'
+  sinon.stub win, 'moveTo'
+  sinon.stub win, 'show'
+  sinon.stub win, 'hide'
+  sinon.stub gui.Window, 'open'
+  sinon.stub win, 'close'
+
+unstub = ->
   win.resizeTo.restore?()
   win.setResizable.restore?()
   win.moveTo.restore?()
@@ -80,25 +89,17 @@ window.reset = ->
   gui.Window.open.restore?()
   win.close.restore?()
   App.localStorage.clear()
-  App.windowHelper.setMainMenu.restore?()
 
 beforeEach ->
   window.server?.restore?()
   window.server = sinon.fakeServer.create()
-  reset()
-  sinon.stub win, 'resizeTo'
-  sinon.stub win, 'setResizable'
-  sinon.stub win, 'moveTo'
-  sinon.stub win, 'show'
-  sinon.stub win, 'hide'
-  sinon.stub gui.Window, 'open'
-  sinon.stub win, 'close'
-  sinon.stub App.windowHelper, 'setMainMenu'
+  unstub()
+  stub()
   Em.run ->
     App.reset()
 
 afterEach ->
-  reset()
+  unstub()
 
 window.onload = ->
   mocha.run()
