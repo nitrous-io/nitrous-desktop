@@ -33,14 +33,17 @@ task :setup do |t|
   puts "=> Initializing Submodules..."
   execute 'git', 'submodule', 'update', '--init'
   puts "=> Downloading node-webkit #{NODE_WEBKIT_VERSION} for OS X..."
-  FileUtils.mkdir_p 'node-webkit'
-  Dir.chdir 'node-webkit' do
+  node_webkit_dir = File.join(ROOT_DIR, 'node-webkit')
+  FileUtils.mkpath node_webkit_dir
+
+  Dir.chdir node_webkit_dir do
     filename = "node-webkit-v#{NODE_WEBKIT_VERSION}-osx-ia32.zip"
     execute 'curl', "https://s3.amazonaws.com/node-webkit/v#{NODE_WEBKIT_VERSION}/#{filename}", '-o', filename
     FileUtils.mkdir_p NODE_WEBKIT_VERSION
     execute 'unzip', filename, '-d', NODE_WEBKIT_VERSION
     execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents')
   end
+
   puts "=> Compiling FSEvents native module..."
   Dir.chdir File.join(VENDOR_DIR, 'fsevents') do
     execute 'nw-gyp', 'configure', "--target=#{NODE_WEBKIT_VERSION}"
@@ -131,6 +134,17 @@ end
 task :build => [:clean, :compile] do
   puts "=> Building #{@target}..."
   compiled_dir = File.join BUILD_DIR, @target
+  FileUtils.mkpath compiled_dir
+
+  if @target == 'production'
+    node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'node-webkit.app')
+    execute 'cp', '-RP', node_webkit_app_dir, compiled_dir
+    execute 'mv', File.join(compiled_dir, 'node-webkit.app'), File.join(compiled_dir, 'Nitrous Desktop.app')
+
+    target_dir = compiled_dir
+    compiled_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources', 'app.nw')
+    FileUtils.mkpath compiled_dir
+  end
 
   # copy fsevents module
   modules_dir = File.join(compiled_dir, 'node_modules')
@@ -143,25 +157,28 @@ task :build => [:clean, :compile] do
   execute 'cp', File.join(VENDOR_DIR, 'fsevents', 'build', 'Release', 'fswatch.node'), fsevents_release_dir
 
   # copy other modules
-  execute 'cp', '-r', File.join(VENDOR_DIR, 'app-path'), modules_dir
+  execute 'cp', '-RP', File.join(VENDOR_DIR, 'app-path'), modules_dir
 
   # copy programs
-  execute 'cp', '-r', File.join(VENDOR_DIR, 'programs'), compiled_dir
+  execute 'cp', '-RP', File.join(VENDOR_DIR, 'programs'), compiled_dir
 
   # copy other resources
   @resources.each do |resource|
-    execute 'cp', '-r', File.join(SOURCE_DIR, resource), compiled_dir
+    execute 'cp', '-RP', File.join(SOURCE_DIR, resource), compiled_dir
   end
 
   # copy font-awesome fonts
-  execute 'cp', '-r', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
+  execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
-  #if @target == 'production'
+  if @target == 'production'
     #filename = "NitrousDesktop-#{@target}-#{load_config['app_version']}"
     #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
 
     #puts "=> build/#{@target}/#{filename}.zip"
-  #end
+
+    execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
+    execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
+  end
 end
 
 %w(development staging production).each do |target|
