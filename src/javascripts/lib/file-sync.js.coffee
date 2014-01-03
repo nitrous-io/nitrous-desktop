@@ -22,9 +22,12 @@ App.FileSync = klass = Em.Object.extend
   enabled: false
   started: false
   syncing: false
+  process: null
   watcher: null
   shouldSyncAgain: false
   shouldIgnoreArchives: false
+  shouldRetryWithDelay: false # bool or milliseconds, if true, use default delay (RETRY_DELAY)
+  transferCount: null
   lastErrorMessage: null
   retrySchedule: null
 
@@ -110,10 +113,19 @@ App.FileSync = klass = Em.Object.extend
       console.log "File Sync: stop watching #{boxName} - #{boxPath}"
       watcher.stop()
       @set 'watcher', null
+    if process = @get 'process'
+      @set 'process', null
+      console.log 'File Sync: killing process'
+      process.kill()
+
     @set 'started', false
 
   performSync: (cb) ->
     @set 'lastErrorMessage', null
+    @set 'transferCount', null
+    @set 'shouldSyncAgain', false
+    @set 'shouldRetryWithDelay', false
+
     if @get 'syncing'
       console.log 'File Sync: already syncing, will run sync again'
       @set 'shouldSyncAgain', true
@@ -155,47 +167,64 @@ App.FileSync = klass = Em.Object.extend
             args.push '-ignorearchives'
 
           console.log 'File Sync: syncing...'
-          childProcess.execFile UNISON_BIN_PATH, args, options, (err, stdout, stderr) =>
-            @_processOutput(err, stdout, stderr, cb)
+          @set 'process', process = childProcess.spawn UNISON_BIN_PATH, args, options
+          process.stdout.on 'data', (data) => @_processOutput(data)
+          process.stderr.on 'data', (data) => @_processOutput(data)
+          process.on 'exit', (code) => @_processDidExit(code, cb)
 
-  _processOutput: (err, stdout, stderr, cb) ->
-    console.log "#{stdout.trim()}\n#{stderr.trim()}"
-    console.log 'File Sync: process finished'
-    errorMessage = stderr.match(/[Ee]rror:\s*(.+)$/m)?[1]
-    if err
-      console.log "File Sync: error! code: #{err.code}, killed: #{err.killed}, signal: #{err.signal}"
-      if errorMessage
-        if errorMessage.indexOf('Warning: inconsistent state.') != -1 ||
-           errorMessage.indexOf('on-disk archives are not identical') != -1
-          @set 'lastErrorMessage', 'Inconsistent state'
-          @set 'shouldIgnoreArchives', true
-          @_scheduleRetry(1000)
-        else if stderr.indexOf('Permission denied (publickey)') != -1
-          @set 'lastErrorMessage', 'Authentication failed'
-          @_scheduleRetry()
-        else if errorMessage.indexOf('Lost connection with the server') != -1
-          @set 'lastErrorMessage', 'Connection failed'
-          @_scheduleRetry()
+  _processOutput: (data) ->
+    data = data.toString('utf8')
+    console.log data
+    if errorMessage = data.match(/[Ee]rror:\s*(.+)$/m)?[1]
+      if errorMessage.indexOf('Warning: inconsistent state.') != -1 ||
+         errorMessage.indexOf('on-disk archives are not identical') != -1
+        @set 'lastErrorMessage', 'Inconsistent state'
+        @set 'shouldIgnoreArchives', true
+        @set 'shouldRetryWithDelay', 1000
+      else if data.indexOf('Permission denied (publickey)') != -1
+        @set 'lastErrorMessage', 'Authentication failed'
+        @set 'shouldRetryWithDelay', true
+      else if errorMessage.indexOf('Lost connection with the server') != -1
+        @set 'lastErrorMessage', 'Connection failed'
+        @set 'shouldRetryWithDelay', true
       else
-        @_scheduleRetry()
+        @set 'lastErrorMessage', errorMessage
+        @set 'shouldRetryWithDelay', true
+    else if transferCount = data.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
+      @set 'transferCount', window.parseInt(transferCount.replace(/,/g, ''), 10)
+
+  _processDidExit: (code, cb) ->
+    console.log "File Sync: process exited with code #{code}"
+    @set 'process', null
+    @set 'syncing', false
+
+    retryDelay = @get 'shouldRetryWithDelay'
+
+    if retryDelay || code != 0
+      unless @get 'lastErrorMessage'
+        @set 'lastErrorMessage', 'Unknown error'
+
+      if typeof retryDelay == 'number'
+        @_scheduleRetry(cb, retryDelay)
+      else
+        @_scheduleRetry(cb)
     else
-      if transferCount = stderr.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
-        transferCount = window.parseInt(transferCount.replace(/,/g, ''), 10)
+      if transferCount = @get 'transferCount'
         console.log "File Sync: #{transferCount} item#{if transferCount > 1 then 's' else ''} transferred"
         # TODO: notify completion
         # TODO: mixpanel
-    @set 'syncing', false
-    cb?()
-    if @get 'shouldSyncAgain'
-      @set 'shouldSyncAgain', false
-      @performSync()
 
-  _scheduleRetry: (delay) ->
+      if @get('shouldSyncAgain')
+        @performSync(cb)
+      else
+        cb?()
+
+  _scheduleRetry: (cb, delay) ->
     if @get('retrySchedule') == null
       @set 'retrySchedule', Em.run.later(=>
         @set 'retrySchedule', null
         console.log 'File Sync: retrying...'
-        @performSync()
+        @performSync(cb)
       , delay ? RETRY_DELAY)
 
 klass._create = klass.create
