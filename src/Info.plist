@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>node-webkit</string>
 	<key>CFBundleIconFile</key>
-	<string>nw.icns</string>
+	<string>Icon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>io.nitrous.desktop</string>
 	<key>CFBundleInfoDictionaryVersion</key>

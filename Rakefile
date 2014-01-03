@@ -42,6 +42,8 @@ task :setup do |t|
     FileUtils.mkdir_p NODE_WEBKIT_VERSION
     execute 'unzip', filename, '-d', NODE_WEBKIT_VERSION
     execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents')
+    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'),  File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents', 'Resources')
+    execute 'rm', '-f', File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents', 'Resources', 'nw.icns')
   end
 
   puts "=> Compiling FSEvents native module..."
@@ -139,10 +141,12 @@ task :build => [:clean, :compile] do
   if @target == 'production'
     node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'node-webkit.app')
     execute 'cp', '-RP', node_webkit_app_dir, compiled_dir
-    execute 'mv', File.join(compiled_dir, 'node-webkit.app'), File.join(compiled_dir, 'Nitrous Desktop.app')
+    app_dir = File.join(compiled_dir, 'Nitrous Desktop.app')
+    execute 'mv', File.join(compiled_dir, 'node-webkit.app'), app_dir
 
     target_dir = compiled_dir
-    compiled_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources', 'app.nw')
+    resources_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources')
+    compiled_dir = File.join(resources_dir, 'app.nw')
     FileUtils.mkpath compiled_dir
   end
 
@@ -178,6 +182,10 @@ task :build => [:clean, :compile] do
 
     execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
     execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
+
+    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(app_dir, 'Contents')
+    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'), resources_dir
+    execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
   end
 end
 
