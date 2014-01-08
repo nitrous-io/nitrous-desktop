@@ -26,7 +26,8 @@ window.NitrousDesktop = Em.Application.extend Ember.Evented,
   offline: Em.computed.not 'online'
   accessToken: null
   currentUser: null
-  trayMenu: null
+  userSignedIn: Em.computed.notEmpty 'currentUser'
+  applicationView: null
 
   reset: ->
     @setProperties
@@ -46,9 +47,7 @@ window.App = NitrousDesktop.create
     shoverServerURI: "<%= config['shover_server_uri'] %>"
 
   cleanUp: (cb) ->
-    if trayMenu = @get 'trayMenu'
-      trayMenu.hide()
-      @set 'trayMenu', null
+    Em.View.views['tray-menu-view']?.hide()
     App.Watcher.stopAll()
     App.PortForwarding.killAll ->
       App.FileSync.killAll ->
@@ -88,7 +87,6 @@ win.on 'close', (kind) ->
     win.hide()
 
 App.on 'AppDidLoad', ->
-  App.set 'trayMenu', App.TrayMenu.create()
 
 App.on 'InvalidAccessToken', ->
   App.clearAccessTokenAndRestart()

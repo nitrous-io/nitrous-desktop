@@ -4,23 +4,26 @@ appPath = require 'app-path'
 path = require 'path'
 fs = require 'fs'
 
-App.TrayMenu = Em.View.extend
+App.TrayMenuView = Em.View.extend
+  elementId: 'tray-menu-view'
   tray: null
   mainMenu: null
+  openWindowMenuItem: null
+  openFolderMenuItem: null
+  openWebMenuItem: null
+  signOutMenuItem: null
+  quitMenuItem: null
 
   init: ->
     @_super.apply this, arguments
 
-    mainMenu           = new gui.Menu
-
-    openWindowMenuItem = new gui.MenuItem(label: 'Open Nitrous Desktop...')
-
-    openFolderMenuItem = new gui.MenuItem(label: 'Open Nitrous.IO Folder...')
-    openWebMenuItem    = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
-
-    signOutMenuItem    = new gui.MenuItem(label: 'Sign Out')
-
-    quitMenuItem       = new gui.MenuItem(label: 'Quit Nitrous Desktop')
+    @setProperties
+      mainMenu:           mainMenu           = new gui.Menu
+      openWindowMenuItem: openWindowMenuItem = new gui.MenuItem(label: 'Open Nitrous Desktop...')
+      openFolderMenuItem: openFolderMenuItem = new gui.MenuItem(label: 'Open Nitrous Folder...')
+      openWebMenuItem:    openWebMenuItem    = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
+      signOutMenuItem:    signOutMenuItem    = new gui.MenuItem(label: 'Sign Out')
+      quitMenuItem:       quitMenuItem       = new gui.MenuItem(label: 'Quit Nitrous Desktop')
 
     openWindowMenuItem.click = ->
       win.show()
@@ -43,6 +46,8 @@ App.TrayMenu = Em.View.extend
     quitMenuItem.click = ->
       App.quit()
 
+    @_enableOrDisableMenuItems()
+
     mainMenu.append(openWindowMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(openFolderMenuItem)
@@ -51,8 +56,12 @@ App.TrayMenu = Em.View.extend
     mainMenu.append(signOutMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(quitMenuItem)
-    @set 'mainMenu', mainMenu
+
+  didInsertElement: ->
     @show()
+
+  willDestroyElement: ->
+    @hide()
 
   show: ->
     @hide() if @get 'tray'
@@ -67,3 +76,13 @@ App.TrayMenu = Em.View.extend
     if tray = @get 'tray'
       tray.remove()
       @set 'tray', null
+
+  _enableOrDisableMenuItems: (->
+    userSignedIn = App.get 'userSignedIn'
+    online = App.get 'online'
+
+    @get('openWindowMenuItem')?.enabled = userSignedIn
+    @get('openFolderMenuItem')?.enabled = userSignedIn
+    @get('openWebMenuItem')?.enabled = userSignedIn && online
+    @get('signOutMenuItem')?.enabled = userSignedIn
+  ).observes 'App.userSignedIn', 'App.online'
