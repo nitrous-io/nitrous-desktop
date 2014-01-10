@@ -11,6 +11,7 @@ App.TrayMenuView = Em.View.extend
   openWindowMenuItem: null
   openFolderMenuItem: null
   openWebMenuItem: null
+  preferencesMenuItem: null
   signOutMenuItem: null
   quitMenuItem: null
 
@@ -18,12 +19,13 @@ App.TrayMenuView = Em.View.extend
     @_super.apply this, arguments
 
     @setProperties
-      mainMenu:           mainMenu           = new gui.Menu
-      openWindowMenuItem: openWindowMenuItem = new gui.MenuItem(label: 'Open Nitrous Desktop...')
-      openFolderMenuItem: openFolderMenuItem = new gui.MenuItem(label: 'Open Nitrous Folder...')
-      openWebMenuItem:    openWebMenuItem    = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
-      signOutMenuItem:    signOutMenuItem    = new gui.MenuItem(label: 'Sign Out')
-      quitMenuItem:       quitMenuItem       = new gui.MenuItem(label: 'Quit Nitrous Desktop')
+      mainMenu:            mainMenu            = new gui.Menu
+      openWindowMenuItem:  openWindowMenuItem  = new gui.MenuItem(label: 'Open Nitrous Desktop...')
+      openFolderMenuItem:  openFolderMenuItem  = new gui.MenuItem(label: 'Open Nitrous Folder...')
+      openWebMenuItem:     openWebMenuItem     = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
+      preferencesMenuItem: preferencesMenuItem = new gui.MenuItem(label: 'Preferences...')
+      signOutMenuItem:     signOutMenuItem     = new gui.MenuItem(label: 'Sign Out')
+      quitMenuItem:        quitMenuItem        = new gui.MenuItem(label: 'Quit Nitrous Desktop')
 
     openWindowMenuItem.click = ->
       win.show()
@@ -40,6 +42,9 @@ App.TrayMenuView = Em.View.extend
     openWebMenuItem.click = ->
       App.utility.openWebsitePath '/'
 
+    preferencesMenuItem.click = =>
+      @get('controller').transitionToRoute('preferences')
+
     signOutMenuItem.click = ->
       App.trigger 'SignOut'
 
@@ -52,6 +57,8 @@ App.TrayMenuView = Em.View.extend
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(openFolderMenuItem)
     mainMenu.append(openWebMenuItem)
+    mainMenu.append(new gui.MenuItem type: 'separator')
+    mainMenu.append(preferencesMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(signOutMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
@@ -84,5 +91,6 @@ App.TrayMenuView = Em.View.extend
     @get('openWindowMenuItem')?.enabled = userSignedIn
     @get('openFolderMenuItem')?.enabled = userSignedIn
     @get('openWebMenuItem')?.enabled = userSignedIn && online
+    @get('preferencesMenuItem')?.enabled = userSignedIn
     @get('signOutMenuItem')?.enabled = userSignedIn
   ).observes 'App.userSignedIn', 'App.online'

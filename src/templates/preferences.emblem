@@ -1,0 +1,57 @@
+.info
+  .info-row
+    .left
+    .right
+      h3 Preferences
+
+  .info-row
+    .left
+    .right
+      h4 Account
+
+  .info-row
+    .left Username
+    .right
+      p
+        | {{ user.username }}
+        if user.fullName
+          | ({{ user.fullName}})
+      button.btn.btn-white click='signOut' Sign Out
+
+  .info-row
+    .left
+    .right
+      h4 SSH Key Pair
+
+  .info-row
+    .left Private Key
+    .right
+      .key-path
+        .selectable title={ view.privateKeyHint }
+          if keyPair.privateKeyPath
+            = keyPair.privateKeyPath
+          else
+            | Not Found
+        button.btn.btn-white click='rescanKeyPair' disabled={ scanning } Rescan
+
+  .info-row
+    .left Public Key
+    .right
+      .key-path
+        .selectable title={ keyPair.fingerprint }
+          if keyPair.publicKeyPath
+            = keyPair.publicKeyPath
+          else
+            | Not Found
+
+  .info-row
+    .left
+    .right
+      button.btn.btn-white.key-pair-btn click='generateKeyPair' disabled={ view.generateKeyPairButtonDisabled } Generate SSH Key Pair
+      = keyPairGenerationResult
+
+  .info-row
+    .left
+    .right
+      button.btn.btn-white.key-pair-btn click='registerPublicKey' disabled={ view.registerPublicKeyButtonDisabled } Register Public Key
+      = publicKeyRegistrationResult

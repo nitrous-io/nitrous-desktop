@@ -2,6 +2,7 @@
 
 App.PublicKey = klass = App.BaseModel.extend
   name: Em.attr()
+  key: Em.attr()
   md5Fingerprint: Em.attr()
 
 klass.reopenClass

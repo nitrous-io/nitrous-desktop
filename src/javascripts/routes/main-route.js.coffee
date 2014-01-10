@@ -20,6 +20,8 @@ App.MainRoute = Em.Route.extend
     App.Region.find()
     @controllerFor('boxesList').set 'model', App.Box.find()
     @controllerFor('publicKeysList').set 'model', App.PublicKey.find()
+    @controllerFor('preferences').set 'keyPair', keyPair = App.KeyPair.create()
+    keyPair.scan()
 
   activate: ->
     win = gui.Window.get()

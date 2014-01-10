@@ -12,6 +12,7 @@ App.OAuthRESTAdapter = Em.RESTAdapter.extend
       if jqXHR.status == 401
         App.trigger 'InvalidAccessToken'
       jqXHR
+    ajax
 
   makeRequest: (record, action, method='GET', params)  ->
     recordClass = record.constructor
