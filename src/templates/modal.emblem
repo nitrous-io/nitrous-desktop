@@ -1,0 +1,17 @@
+.centered-window
+  .sheet
+    .content
+      .text
+        p = textOne
+        p = textTwo
+        p.small = textThree
+      .buttons
+        if cancelButtonText
+          button.native click='cancel'
+            = cancelButtonText
+        if okButtonText
+          button.native click='ok'
+            = okButtonText
+        else
+          button.native.ok click='ok' OK
+  .top-shadow

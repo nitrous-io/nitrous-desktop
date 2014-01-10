@@ -1,4 +1,5 @@
 App.MainController = Em.Controller.extend
+  needs: ['preferences', 'modal']
   modelBinding: 'App.currentUser'
   shoverSocket: null
 
@@ -18,3 +19,27 @@ App.MainController = Em.Controller.extend
         App.Box.find(data.id).load(data.id, data)
 
     shoverSocket.connect()
+
+  checkKeyPairRequirement: ->
+    controller = this
+    preferencesController = @get 'controllers.preferences'
+    modalController = @get 'controllers.modal'
+    keyPair = preferencesController.get 'keyPair'
+    keyPair.scan ->
+      unless keyPair.get('exists')
+        modalController.setProperties
+          textOne: 'Nitrous Desktop could not find an existing SSH key pair on this computer.'
+          textTwo: 'Would you like to generate one and register it with Nitrous.IO?'
+          textThree: 'This is required to securely connect to your Nitrous.IO boxes.'
+          cancelButtonText: 'Quit Nitrous.IO'
+          okButtonText: 'Generate Key Pair'
+          onCancel: ->
+            App.quit()
+          onOk: ->
+            Em.run.next ->
+              controller.transitionToRoute 'preferences'
+              preferencesController.generateKeyPair (err) ->
+                return if err
+                preferencesController.registerPublicKey()
+        Em.run.next ->
+          modalController.show()

@@ -6,6 +6,28 @@ App.PreferencesController = Em.Controller.extend
   keyPairGenerationResult: null
   publicKeyRegistrationResult: null
 
+  generateKeyPair: (cb) ->
+    @set 'keyPairGenerationResult', null
+    keyPair = @get 'keyPair'
+    keyPair.generate (err) =>
+      if err
+        @set 'keyPairGenerationResult', 'Key Pair Generation Failed'
+        cb?(err)
+      else
+        @set 'keyPairGenerationResult', 'Key Pair Successfully Generated'
+        keyPair.scan ->
+          cb?()
+
+  registerPublicKey: ->
+    if key = @get 'keyPair.publicKey'
+      @set 'publicKeyRegistrationResult', null
+      record = App.PublicKey.create key: key
+      record.save().then =>
+        @set 'publicKeyRegistrationResult', 'Key Successfully Registered'
+      , (jqXHR) =>
+        if jqXHR.status == 422
+          @set 'publicKeyRegistrationResult', 'Key Already Registered'
+
   actions:
     signOut: ->
       App.trigger 'SignOut'
@@ -16,21 +38,7 @@ App.PreferencesController = Em.Controller.extend
         @set 'scanning', false
 
     generateKeyPair: ->
-      @set 'keyPairGenerationResult', null
-      keyPair = @get 'keyPair'
-      keyPair.generate (err) =>
-        if err
-          @set 'keyPairGenerationResult', 'Key Pair Generation Failed'
-        else
-          keyPair.scan()
-          @set 'keyPairGenerationResult', 'Key Pair Successfully Generated'
+      @generateKeyPair()
 
     registerPublicKey: ->
-      if key = @get 'keyPair.publicKey'
-        @set 'publicKeyRegistrationResult', null
-        record = App.PublicKey.create key: key
-        record.save().then =>
-          @set 'publicKeyRegistrationResult', 'Key Successfully Registered'
-        , (jqXHR) =>
-          if jqXHR.status == 422
-            @set 'publicKeyRegistrationResult', 'Key Already Registered'
+      @registerPublicKey()

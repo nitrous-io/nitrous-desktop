@@ -13,6 +13,7 @@ App.MainRoute = Em.Route.extend
     @_super()
     @render 'boxesList',      into: 'main', outlet: 'boxesList',      controller: 'boxesList'
     @render 'publicKeysList', into: 'main', outlet: 'publicKeysList', controller: 'publicKeysList'
+    @render 'modal',          into: 'main', outlet: 'modal',          controller: 'modal'
 
   setupController: (controller, model) ->
     @_super(controller, model)
@@ -20,8 +21,8 @@ App.MainRoute = Em.Route.extend
     App.Region.find()
     @controllerFor('boxesList').set 'model', App.Box.find()
     @controllerFor('publicKeysList').set 'model', App.PublicKey.find()
-    @controllerFor('preferences').set 'keyPair', keyPair = App.KeyPair.create()
-    keyPair.scan()
+    @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
+    controller.checkKeyPairRequirement()
 
   activate: ->
     win = gui.Window.get()

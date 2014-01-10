@@ -1,3 +1,4 @@
+= outlet modal
 #sidebar
   .lists
     = outlet boxesList
@@ -5,4 +6,3 @@
 #main
   #content
     = outlet content
-  App.FooterView userBinding='App.currentUser'
