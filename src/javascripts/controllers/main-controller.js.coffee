@@ -1,5 +1,5 @@
 App.MainController = Em.Controller.extend
-  needs: ['preferences', 'modal']
+  needs: ['preferences', 'publicKeysList', 'modal']
   modelBinding: 'App.currentUser'
   shoverSocket: null
 
@@ -20,16 +20,19 @@ App.MainController = Em.Controller.extend
 
     shoverSocket.connect()
 
-  checkKeyPairRequirement: ->
+  # checks whether system ssh key pair exists
+  checkKeyPairRequirement: (cb) ->
     controller = this
     preferencesController = @get 'controllers.preferences'
     modalController = @get 'controllers.modal'
     keyPair = preferencesController.get 'keyPair'
     keyPair.scan ->
-      unless keyPair.get('exists')
+      if keyPair.get('exists')
+        cb?()
+      else
         modalController.setProperties
           textOne: 'Nitrous Desktop could not find an existing SSH key pair on this computer.'
-          textTwo: 'Would you like to generate one and register it with Nitrous.IO?'
+          textTwo: 'Generate one and register it with Nitrous.IO?'
           textThree: 'This is required to securely connect to your Nitrous.IO boxes.'
           cancelButtonText: 'Quit Nitrous.IO'
           okButtonText: 'Generate Key Pair'
@@ -41,5 +44,33 @@ App.MainController = Em.Controller.extend
               preferencesController.generateKeyPair (err) ->
                 return if err
                 preferencesController.registerPublicKey()
+                cb?()
+          afterDismiss: null
+        Em.run.next ->
+          modalController.show()
+
+  # checks whether system public key is registered
+  checkPublicKeyRequirement: ->
+    controller = this
+    publicKeysListController = @get 'controllers.publicKeysList'
+    preferencesController = @get 'controllers.preferences'
+    modalController = @get 'controllers.modal'
+    keyPair = preferencesController.get 'keyPair'
+    if fingerprint = keyPair.get 'fingerprint'
+      unless publicKeysListController.findBy 'md5Fingerprint', fingerprint
+        modalController.setProperties
+          textOne: "This computer's SSH public key is not yet registered with Nitrous.IO."
+          textTwo: 'Register it with Nitrous.IO?'
+          textThree: 'This is required to securely connect to your Nitrous.IO boxes.'
+          cancelButtonText: 'Quit Nitrous.IO'
+          okButtonText: 'Register Public Key'
+          onCancel: ->
+            App.quit()
+          onOk: ->
+            Em.run.next ->
+              controller.transitionToRoute 'preferences'
+              preferencesController.registerPublicKey()
+              cb?()
+          afterDismiss: null
         Em.run.next ->
           modalController.show()

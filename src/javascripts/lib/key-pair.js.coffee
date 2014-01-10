@@ -55,7 +55,7 @@ App.KeyPair = Em.Object.extend
             '-b', '2048' # bits
             '-t', 'rsa'  # type
             '-N', ''     # passphrase: none
-            '-C', "nitrous-desktop@#{os.hostname()}"  # name/comment
+            '-C', "nitrous-desktop@#{os.hostname().replace /\.local$/, ''}"  # name/comment
             '-f', privateKeyPath
           ]
 

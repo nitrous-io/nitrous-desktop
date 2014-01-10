@@ -19,10 +19,12 @@ App.MainRoute = Em.Route.extend
     @_super(controller, model)
     App.BoxTemplate.find()
     App.Region.find()
-    @controllerFor('boxesList').set 'model', App.Box.find()
-    @controllerFor('publicKeysList').set 'model', App.PublicKey.find()
     @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
-    controller.checkKeyPairRequirement()
+    controller.checkKeyPairRequirement =>
+      @controllerFor('boxesList').set 'model', App.Box.find()
+      @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
+      publicKeys.one 'didLoad', (key) ->
+        controller.checkPublicKeyRequirement()
 
   activate: ->
     win = gui.Window.get()
