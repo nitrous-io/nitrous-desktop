@@ -1,6 +1,8 @@
 App.PreferencesController = Em.Controller.extend
+  needs: ['update']
   userBinding: 'App.currentUser'
   keyPair: null
+  updateChecker: null
 
   scanning: false
   keyPairGenerationResult: null
@@ -31,6 +33,9 @@ App.PreferencesController = Em.Controller.extend
   actions:
     signOut: ->
       App.trigger 'SignOut'
+
+    checkForUpdate: ->
+      @get('controllers.update').check()
 
     rescanKeyPair: ->
       @set 'scanning', true

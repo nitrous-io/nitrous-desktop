@@ -9,5 +9,9 @@ App.PreferencesView = Em.View.extend
       "#{bits}-bit #{type} Key"
   ).property 'controller.keyPair.bits', 'controller.keyPair.type'
 
+  downloadProgress: (->
+    (@get('controller.controllers.update.downloadedBytes') / @get('controller.controllers.update.newVersionFileSize') * 100).toFixed 0
+  ).property 'controller.controllers.update.newVersionFileSize', 'controller.controllers.update.downloadedBytes'
+
   generateKeyPairButtonDisabled:   Em.computed.or 'controller.scanning', 'controller.keyPair.exists'
   registerPublicKeyButtonDisabled: Em.computed.or 'controller.scanning', 'controller.keyPair.noPublicKey'

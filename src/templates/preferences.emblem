@@ -21,6 +21,36 @@
   .info-row
     .left
     .right
+      h4 General
+
+  .info-row
+    .left
+    .right
+      .checkbox
+        label
+          input type="checkbox"
+          | Launch Nitrous Desktop Automatically
+
+  .info-row
+    .left
+    .right
+      unless controllers.update.updating
+        button.btn.btn-white click='checkForUpdate' disabled={ controllers.update.checking } Check For Update
+        if controllers.update.checkFailed
+          | Check failed
+        else
+          if controllers.update.updateFailed
+            | Update failed
+      else
+        .update-progress
+          if controllers.update.downloading
+            | Downloading Update...
+            | &nbsp;
+            span {{ view.downloadProgress }}%
+
+  .info-row
+    .left
+    .right
       h4 SSH Key Pair
 
   .info-row

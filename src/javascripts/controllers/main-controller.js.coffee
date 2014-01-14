@@ -44,20 +44,22 @@ App.MainController = Em.Controller.extend
               preferencesController.generateKeyPair (err) ->
                 return if err
                 preferencesController.registerPublicKey()
-                cb?()
-          afterDismiss: null
+          afterDismiss: ->
+            cb?()
         Em.run.next ->
           modalController.show()
 
   # checks whether system public key is registered
-  checkPublicKeyRequirement: ->
+  checkPublicKeyRequirement: (cb) ->
     controller = this
     publicKeysListController = @get 'controllers.publicKeysList'
     preferencesController = @get 'controllers.preferences'
     modalController = @get 'controllers.modal'
     keyPair = preferencesController.get 'keyPair'
     if fingerprint = keyPair.get 'fingerprint'
-      unless publicKeysListController.findBy 'md5Fingerprint', fingerprint
+      if publicKeysListController.findBy 'md5Fingerprint', fingerprint
+        cb?()
+      else
         modalController.setProperties
           textOne: "This computer's SSH public key is not yet registered with Nitrous.IO."
           textTwo: 'Register it with Nitrous.IO?'
@@ -70,7 +72,7 @@ App.MainController = Em.Controller.extend
             Em.run.next ->
               controller.transitionToRoute 'preferences'
               preferencesController.registerPublicKey()
-              cb?()
-          afterDismiss: null
+          afterDismiss: ->
+            cb?()
         Em.run.next ->
           modalController.show()

@@ -1,2 +1,3 @@
 App.TrayMenuView
+= outlet modal
 = outlet

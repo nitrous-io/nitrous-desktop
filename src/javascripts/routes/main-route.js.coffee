@@ -13,7 +13,6 @@ App.MainRoute = Em.Route.extend
     @_super()
     @render 'boxesList',      into: 'main', outlet: 'boxesList',      controller: 'boxesList'
     @render 'publicKeysList', into: 'main', outlet: 'publicKeysList', controller: 'publicKeysList'
-    @render 'modal',          into: 'main', outlet: 'modal',          controller: 'modal'
 
   setupController: (controller, model) ->
     @_super(controller, model)
@@ -23,8 +22,9 @@ App.MainRoute = Em.Route.extend
     controller.checkKeyPairRequirement =>
       @controllerFor('boxesList').set 'model', App.Box.find()
       @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
-      publicKeys.one 'didLoad', (key) ->
-        controller.checkPublicKeyRequirement()
+      publicKeys.one 'didLoad', (key) =>
+        controller.checkPublicKeyRequirement =>
+          @controllerFor('update').check()
 
   activate: ->
     win = gui.Window.get()

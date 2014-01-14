@@ -1,0 +1,182 @@
+appPath = require 'app-path'
+childProcess = require 'child_process'
+fs = require 'fs'
+http = require 'http'
+https = require 'https'
+os = require 'os'
+path = require 'path'
+url = require 'url'
+
+APPCAST_URL = "#{App.get 'config.host'}/mac/appcast.xml"
+UPDATE_SCRIPT_PATH = path.join(appPath, 'programs',
+  "nitrous-update.#{if os.type() == 'Windows_NT' then 'bat' else 'sh'}")
+
+App.UpdateController = klass = Em.Controller.extend
+  needs: ['modal']
+  checking: false
+  checkFailed: false
+  newVersion: null
+  newVersionURL: null
+  newVersionFileSize: 0
+  updating: false
+  updateFailed: false
+  downloading: false
+  downloadedBytes: 0
+
+  check: ->
+    unless @get 'checking'
+      @set 'checkFailed', false
+      @set 'updateFailed', false
+      @set 'checking', true
+
+      $.ajax(
+        type: 'GET'
+        url: APPCAST_URL
+        dataType: 'xml'
+      ).done((xml, status, jqXHR) =>
+        if xml instanceof Document
+          if enclosure = $('item', xml).eq(0).find('enclosure').eq(0)
+            version = enclosure.attr('sparkle:version')
+            itemUrl = enclosure.attr('url')
+            fileSize = window.parseInt enclosure.attr('length'), 10
+            if version && url && fileSize && (klass.compareVersion(version, App.get('config.appVersion')) == 1)
+              @setProperties
+                newVersion: version
+                newVersionURL: itemUrl
+                newVersionFileSize: fileSize
+              @presentUpdateModalDialog()
+      ).fail((jqXHR, status, errMsg) =>
+        @set 'checkFailed', true
+      ).always =>
+        @set 'checking', false
+
+  presentUpdateModalDialog: ->
+    newVersion = @get 'newVersion'
+    newVersionURL = @get 'newVersionURL'
+    newVersionFileSize = @get 'newVersionFileSize'
+
+    if newVersion && newVersionURL && newVersionFileSize
+      controller = this
+      modalController = @get 'controllers.modal'
+      modalController.setProperties
+        textOne: "A new version of Nitrous Desktop is available!"
+        textTwo: 'Download and install update?'
+        textThree: "Nitrous Desktop #{newVersion} is now available (you have #{App.get 'config.appVersion'})."
+        cancelButtonText: 'Not Now'
+        okButtonText: 'Install Update'
+        onCancel: ->
+        onOk: =>
+          Em.run.next =>
+            @transitionToRoute 'preferences'
+            @_performUpdate()
+      Em.run.next ->
+        modalController.show()
+
+  _performUpdate: ->
+    unless @get 'updating'
+      @set 'updating', true
+      @set 'updateFailed', false
+      @_downloadUpdate()
+
+  _downloadUpdate: ->
+    @set 'downloading', true
+    @set 'downloadedBytes', 0
+
+    newVersionURL = @get 'newVersionURL'
+    newVersionFileSize = @get 'newVersionFileSize'
+    parsedURL = url.parse(newVersionURL)
+
+    isHTTPS = parsedURL.protocol == 'https:'
+
+    options =
+      method: 'GET'
+      hostname: parsedURL.hostname
+      port: parsedURL.port ? (if isHTTPS then 443 else 80)
+      path: parsedURL.path
+      headers:
+        'user-agent': App.utility.userAgent()
+        accept: '*/*'
+
+    if isHTTPS && App.get('config.environment') == 'development'
+      options.rejectUnauthorized = false
+
+    h = if isHTTPS then https else http
+
+    fail = =>
+      @set 'updateFailed', true
+      @set 'updating', false
+      @set 'downloading', false
+
+    App.utility.withDataFolder (dataPath) =>
+      downloadFolderPath = path.join dataPath, 'Updates'
+      fs.mkdir downloadFolderPath, =>
+        fileName = parsedURL.path.split('/').slice(-1)[0]
+        downloadPath = path.join downloadFolderPath, fileName
+        tempDownloadPath = path.join downloadFolderPath, fileName + '.downloading'
+
+        writeStream = fs.createWriteStream tempDownloadPath, encoding: 'binary'
+
+        console.log "Update: Downloading #{newVersionURL} -> #{tempDownloadPath} (#{newVersionFileSize} bytes)"
+        request = h.request options, (response) =>
+          contentLength = window.parseInt response.headers['content-length'], 10
+          console.log "Update: #{response.statusCode}, Length: #{contentLength} bytes"
+          if response.statusCode != 200 || contentLength != newVersionFileSize
+            console.log 'Update: Failed!'
+            request.abort()
+            writeStream.end()
+            fail()
+            return
+
+          response.setEncoding 'binary'
+          response.on 'data', (chunk) =>
+            writeStream.write chunk, 'binary'
+            @set 'downloadedBytes', @get('downloadedBytes') + chunk.length
+
+          response.on 'end', =>
+            writeStream.end()
+            fs.rename tempDownloadPath, downloadPath, =>
+              console.log 'Update: Download Finished'
+              @set 'downloading', false
+              @_installUpdate(downloadPath)
+
+        request.on 'error', (err) =>
+          console.log "Update: Failed! #{err.message}"
+          writeStream.end()
+          fail()
+
+        request.end()
+
+  _installUpdate: (downloadPath) ->
+    if App.get('config.environment') == 'development'
+      console.log 'Update: Development mode. Aborting.'
+      @set 'updating', false
+      return
+
+    # TODO windows
+
+    executablePath = App.utility.installPath()
+
+    args = [
+      UPDATE_SCRIPT_PATH
+      process.pid
+      executablePath
+      downloadPath
+    ]
+
+    options =
+      cwd: path.join executablePath, '..'
+      detached: true
+
+    console.log args
+    childProcess.spawn '/bin/bash', args, options
+
+    Em.run.next ->
+      App.quit()
+
+klass.reopenClass
+  compareVersion: (a, b) ->
+    [aMajor, aMinor, aPatch] = a.split '.'
+    [bMajor, bMinor, bPatch] = b.split '.'
+    aMajor.localeCompare(bMajor) ||
+      aMinor.localeCompare(bMinor) ||
+      aPatch.localeCompare(bPatch)

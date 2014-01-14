@@ -74,6 +74,7 @@ win.show()
 stub = ->
   sinon.stub win, 'resizeTo'
   sinon.stub win, 'setResizable'
+  sinon.stub win, 'setAlwaysOnTop'
   sinon.stub win, 'moveTo'
   sinon.stub win, 'show'
   sinon.stub win, 'hide'
@@ -83,6 +84,7 @@ stub = ->
 unstub = ->
   win.resizeTo.restore?()
   win.setResizable.restore?()
+  win.setAlwaysOnTop.restore?()
   win.moveTo.restore?()
   win.show.restore?()
   win.hide.restore?()
