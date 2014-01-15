@@ -44,6 +44,8 @@ App.TrayMenuView = Em.View.extend
 
     preferencesMenuItem.click = =>
       @get('controller').transitionToRoute('preferences')
+      win.show()
+      win.focus()
 
     signOutMenuItem.click = ->
       App.trigger 'SignOut'
