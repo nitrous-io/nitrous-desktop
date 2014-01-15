@@ -126,11 +126,14 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       "action@#{box.get 'host'}"
     ]
 
+    options =
+      detached: false
+
     @get('forwardedPorts').forEach (port) ->
       args = args.concat ['-L', "#{port}/localhost/#{port}"]
 
     console.log 'Port Forwarding: connecting...'
-    @set 'process', process = childProcess.spawn(SSH_BIN_PATH, args, {})
+    @set 'process', process = childProcess.spawn(SSH_BIN_PATH, args, options)
     process.stdout.on 'data', (data) => @_processOutput(data)
     process.stderr.on 'data', (data) => @_processOutput(data)
     process.on 'exit', (code) =>

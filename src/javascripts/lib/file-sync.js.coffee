@@ -148,6 +148,7 @@ App.FileSync = klass = Em.Object.extend
           args = [
             localPath
             remotePath
+            '-ui', 'text'
             '-auto'  # auto accept default actions
             '-batch' # ask no questions
             '-perms=777'  # sync all permissions
@@ -161,6 +162,7 @@ App.FileSync = klass = Em.Object.extend
 
           options =
             cwd: homePath
+            detached: false
 
           if !exists || @get 'shouldIgnoreArchives'
             @set 'shouldIgnoreArchives', false
