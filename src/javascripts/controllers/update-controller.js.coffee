@@ -75,7 +75,6 @@ App.UpdateController = klass = Em.Controller.extend
   _performUpdate: ->
     unless @get 'updating'
       @set 'updating', true
-      @set 'updateFailed', false
       @_downloadUpdate()
 
   _downloadUpdate: ->
@@ -149,29 +148,41 @@ App.UpdateController = klass = Em.Controller.extend
   _installUpdate: (downloadPath) ->
     if App.get('config.environment') == 'development'
       console.log 'Update: Development mode. Aborting.'
+      @set 'updateFailed', true
       @set 'updating', false
       return
 
     # TODO windows
 
-    executablePath = App.utility.installPath()
+    executablePath = App.utility.executablePath()
+    installPath = path.join executablePath, '..'
 
-    args = [
-      UPDATE_SCRIPT_PATH
-      process.pid
-      executablePath
-      downloadPath
-    ]
+    writeTestFilePath = path.join installPath, '.nitrous-desktop-install'
+    fs.writeFile writeTestFilePath, '', (err) ->
+      if err
+        console.log 'Update: Unable to write to install directory. Aborting.'
+        @set 'updateFailed', true
+        @set 'updating', false
+        return
 
-    options =
-      cwd: path.join executablePath, '..'
-      detached: true
+      fs.unlink(writeTestFilePath)
 
-    console.log args
-    childProcess.spawn '/bin/bash', args, options
+      args = [
+        UPDATE_SCRIPT_PATH
+        process.pid
+        executablePath
+        downloadPath
+      ]
 
-    Em.run.next ->
-      App.quit()
+      options =
+        cwd: installPath
+        detached: true
+
+      console.log args
+      childProcess.spawn '/bin/bash', args, options
+
+      Em.run.next ->
+        App.quit()
 
 klass.reopenClass
   compareVersion: (a, b) ->
