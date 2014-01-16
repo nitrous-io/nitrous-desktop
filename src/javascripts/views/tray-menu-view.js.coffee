@@ -30,6 +30,7 @@ App.TrayMenuView = Em.View.extend
     openWindowMenuItem.click = ->
       win.show()
       win.focus()
+      App.mixpanel?.track 'Opened Main Window'
 
     openFolderMenuItem.click = ->
       App.utility.findHomeFolder (home) =>
@@ -38,14 +39,17 @@ App.TrayMenuView = Em.View.extend
           hiddenFilePath = path.join nitrousFolderPath, '.nitrous.io'
           fs.appendFile hiddenFilePath, '', (err) ->
             gui.Shell.showItemInFolder hiddenFilePath
+      App.mixpanel?.track 'Opened Folder'
 
     openWebMenuItem.click = ->
       App.utility.openWebsitePath '/'
+      App.mixpanel?.track 'Opened Website'
 
     preferencesMenuItem.click = =>
       @get('controller').transitionToRoute('preferences')
       win.show()
       win.focus()
+      App.mixpanel?.track 'Opened Preferences'
 
     signOutMenuItem.click = ->
       App.trigger 'SignOut'

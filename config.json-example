@@ -6,6 +6,7 @@
   , "client_id": "575b8c5a4eefa8d243a89fc1204315f106be895fc11f6d4fd4cd96a4efaa4d10"
   , "client_secret": "06273e99bc713d28ac628e2e79c2ac5d4de7742c1bb27e7560491b784fea5373"
   , "shover_server_uri": "https://www.n2odev.com:5003"
+  , "mixpanel_token": "74ed86b8b84f4a58b2e7ddc326cf5845"
   }
 , "staging": {
     "app_name": "Nitrous Desktop (staging)"
@@ -14,6 +15,7 @@
   , "client_id": ""
   , "client_secret": ""
   , "shover_server_uri": ""
+  , "mixpanel_token": ""
   }
 , "production": {
     "app_name": "Nitrous Desktop"
@@ -22,5 +24,6 @@
   , "client_id": ""
   , "client_secret": ""
   , "shover_server_uri": ""
+  , "mixpanel_token": ""
   }
 }

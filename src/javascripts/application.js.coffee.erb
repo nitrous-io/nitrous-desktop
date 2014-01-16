@@ -28,6 +28,7 @@ window.NitrousDesktop = Em.Application.extend Ember.Evented,
   currentUser: null
   userSignedIn: Em.computed.notEmpty 'currentUser'
   applicationView: null
+  mixpanel: null
 
   reset: ->
     @setProperties
@@ -45,6 +46,7 @@ window.App = NitrousDesktop.create
     clientId: "<%= config['client_id'] %>"
     clientSecret: "<%= config['client_secret'] %>"
     shoverServerURI: "<%= config['shover_server_uri'] %>"
+    mixpanelToken: "<%= config['mixpanel_token'] %>"
 
   cleanUp: (cb) ->
     Em.View.views['tray-menu-view']?.hide()
@@ -87,6 +89,9 @@ win.on 'close', (kind) ->
     win.hide()
 
 App.on 'AppDidLoad', ->
+  App.set 'mixpanel', App.Mixpanel.create
+    tokenBinding: 'App.config.mixpanelToken'
+    userBinding: 'App.currentUser'
 
 App.on 'InvalidAccessToken', ->
   App.clearAccessTokenAndRestart()

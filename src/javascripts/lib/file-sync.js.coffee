@@ -93,6 +93,7 @@ App.FileSync = klass = Em.Object.extend
     boxName = @get 'box.name'
     boxPath = path.join nitrousPath, boxName
     console.log "File Sync: start watching #{boxName} - #{boxPath}"
+    App.mixpanel?.track 'File Sync Started Monitoring', box_id: @get('box.id')
     fs.mkdir nitrousPath, '0755', (err) =>
       fs.mkdir boxPath, '0755', (err) =>
         @set 'watcher', watcher = new App.Watcher(nitrousPath)
@@ -111,6 +112,7 @@ App.FileSync = klass = Em.Object.extend
       boxName = @get 'box.name'
       boxPath = path.join nitrousPath, boxName
       console.log "File Sync: stop watching #{boxName} - #{boxPath}"
+      App.mixpanel?.track 'File Sync Stopped Monitoring', box_id: @get('box.id')
       watcher.stop()
       @set 'watcher', null
     if process = @get 'process'
@@ -194,6 +196,7 @@ App.FileSync = klass = Em.Object.extend
         @set 'shouldRetryWithDelay', true
     else if transferCount = data.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
       @set 'transferCount', window.parseInt(transferCount.replace(/,/g, ''), 10)
+      App.mixpanel?.track 'File Sync Performed', box_id: @get('box.id')
 
   _processDidExit: (code, cb) ->
     console.log "File Sync: process exited with code #{code}"

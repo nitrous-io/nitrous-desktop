@@ -4,7 +4,8 @@ App.MainController = Em.Controller.extend
   shoverSocket: null
 
   didObtainCurrentUser: (->
-    @connectToShover()
+    if @get('model.id')
+      @connectToShover() if @get('model.id')
   ).observes 'model.id'
 
   connectToShover: ->

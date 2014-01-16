@@ -19,6 +19,8 @@ App.PreferencesController = Em.Controller.extend
         @set 'keyPairGenerationResult', 'Key Pair Successfully Generated'
         keyPair.scan ->
           cb?()
+        App.mixpanel?.track 'Generated SSH Key Pair'
+
 
   registerPublicKey: ->
     if key = @get 'keyPair.publicKey'
@@ -26,6 +28,7 @@ App.PreferencesController = Em.Controller.extend
       record = App.PublicKey.create key: key
       record.save().then =>
         @set 'publicKeyRegistrationResult', 'Key Successfully Registered'
+        App.mixpanel?.track 'Registered SSH Key Pair'
       , (jqXHR) =>
         if jqXHR.status == 422
           @set 'publicKeyRegistrationResult', 'Key Already Registered'

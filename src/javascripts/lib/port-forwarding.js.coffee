@@ -147,6 +147,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     retrySchedule = @get 'retrySchedule'
     if process || retrySchedule
       console.log "Port Forwarding: stop #{@get 'box.name'}"
+      App.mixpanel?.track 'SSH Tunnel Destroyed', box_id: @get('box.id')
       if retrySchedule
         Em.run.cancel(retrySchedule)
         @set 'retrySchedule', null
@@ -175,6 +176,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     console.log data
     if match = data.match /^debug1: Entering interactive session\./m
       @set 'connected', true
+      App.mixpanel?.track 'SSH Tunnel Established', box_id: @get('box.id')
     else
       if match = data.match /^channel_setup_fwd_listener: cannot listen to port: (\d+)/m
         @set 'lastErrorMessage', "Port #{match[1]} is already in use"

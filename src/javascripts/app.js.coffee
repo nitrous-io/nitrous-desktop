@@ -5,8 +5,8 @@
 #= require_tree ./components
 #= require_tree ../templates
 #= require_tree ./routes
-#= require router
 #= require_self
+#= require router
 
-# all classes are loaded
+# all classes except router are loaded
 App.trigger 'AppDidLoad'
