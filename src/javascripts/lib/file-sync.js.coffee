@@ -5,7 +5,7 @@ fs = require 'fs'
 os = require 'os'
 path = require 'path'
 
-IGNORE_LIST = 'Name {.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes}'
+IGNORE_LIST = 'Name {.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
 UNISON_BIN_PATH = path.join(appPath, 'programs',
   "nitrous-unison#{if os.type() == 'Windows_NT' then '.exe' else ''}")
 
@@ -145,6 +145,7 @@ App.FileSync = klass = Em.Object.extend
             '-o StrictHostKeyChecking=no'           # no host key checking
             '-o PreferredAuthentications=publickey' # pub key authentication only
             '-c blowfish-cbc'                       # use blowfish cipher
+            '-q'                                    # quiet mode
           ]
 
           args = [
@@ -159,7 +160,9 @@ App.FileSync = klass = Em.Object.extend
             '-rsrc=false' # don't sync resource fork
             '-sshargs', sshArgs.join ' '
             '-ignore', IGNORE_LIST
+            '-ignorecase', 'true' # case-insensitive
             '-prefer', remotePath
+            '-terse' # reduce output
           ]
 
           options =
@@ -184,16 +187,15 @@ App.FileSync = klass = Em.Object.extend
          errorMessage.indexOf('on-disk archives are not identical') != -1
         @set 'lastErrorMessage', 'Inconsistent state'
         @set 'shouldIgnoreArchives', true
-        @set 'shouldRetryWithDelay', 1000
-      else if data.indexOf('Permission denied (publickey)') != -1
-        @set 'lastErrorMessage', 'Authentication failed'
-        @set 'shouldRetryWithDelay', true
+        @set 'shouldRetryWithDelay', 500
       else if errorMessage.indexOf('Lost connection with the server') != -1
         @set 'lastErrorMessage', 'Connection failed'
         @set 'shouldRetryWithDelay', true
       else
         @set 'lastErrorMessage', errorMessage
         @set 'shouldRetryWithDelay', true
+    if data.indexOf('Uncaught exception Sys_blocked_io') != -1
+      @set 'shouldRetryWithDelay', 500
     else if transferCount = data.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
       @set 'transferCount', window.parseInt(transferCount.replace(/,/g, ''), 10)
       App.mixpanel?.track 'File Sync Performed', box_id: @get('box.id')
@@ -205,13 +207,12 @@ App.FileSync = klass = Em.Object.extend
 
     retryDelay = @get 'shouldRetryWithDelay'
 
-    if retryDelay || code != 0
-      unless @get 'lastErrorMessage'
-        @set 'lastErrorMessage', 'Unknown error'
-
+    if retryDelay || code == 3
       if typeof retryDelay == 'number'
         @_scheduleRetry(cb, retryDelay)
       else
+        unless @get 'lastErrorMessage'
+          @set 'lastErrorMessage', 'Unknown error'
         @_scheduleRetry(cb)
     else
       if transferCount = @get 'transferCount'
