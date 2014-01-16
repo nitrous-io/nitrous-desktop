@@ -186,6 +186,9 @@ task :build => [:clean, :compile] do
     execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(app_dir, 'Contents')
     execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'), resources_dir
     execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
+
+    execute 'codesign', '--deep', '-f', '-s', 'Developer ID Application: Jihoon Kim', app_dir
+    execute 'codesign', '-vvv', app_dir
   end
 end
 
