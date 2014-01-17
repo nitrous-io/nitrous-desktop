@@ -55,18 +55,9 @@ div class={ :stack-image boxTemplate.runtime }
           = sshURI
 
       .info-row.has-switch
-        .left Port Forwarding
-        .right
-          .switch-with-state
-            = ui-switch preventFastToggling=true enabled=portForwarding.enabled
-            .state
-              div class={:state-orb portForwarding.state}
-              span
-                = portForwarding.stateDescription
-          App.EditableListView label="Port" contentBinding="portForwarding"
-
-      .info-row.has-switch
-        .left File Sync
+        .left
+          | File Sync
+          i.icon-info-sign click='fileSyncHelp'
         .right
           .switch-with-state
             = ui-switch preventFastToggling=true enabled=fileSync.enabled
@@ -78,6 +69,19 @@ div class={ :stack-image boxTemplate.runtime }
             button.btn.btn-white click='syncNow' disabled={ fileSync.syncing } Sync Now
           else
             button.btn.btn-white disabled="disabled" Sync Now
+
+      .info-row.has-switch
+        .left
+          | Port Forwarding
+          i.icon-info-sign click='portForwardingHelp'
+        .right
+          .switch-with-state
+            = ui-switch preventFastToggling=true enabled=portForwarding.enabled
+            .state
+              div class={:state-orb portForwarding.state}
+              span
+                = portForwarding.stateDescription
+          App.EditableListView label="Port" contentBinding="portForwarding"
 
       .info-row.box-access
         .left

@@ -49,3 +49,11 @@ App.BoxController = Em.ObjectController.extend
       gui.Shell.openExternal "ssh://action@#{@get 'host'}:#{@get 'port'}"
       App.mixpanel?.track 'Opened Shell', box_id: box.get('id')
       false
+
+    fileSyncHelp: ->
+      gui.Shell.openExternal 'http://help.nitrous.io/nitrous-desktop/#file_sync'
+      false
+
+    portForwardingHelp: ->
+      gui.Shell.openExternal 'http://help.nitrous.io/nitrous-desktop/#port_forwarding'
+      false

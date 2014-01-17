@@ -12,6 +12,7 @@ App.TrayMenuView = Em.View.extend
   openFolderMenuItem: null
   openWebMenuItem: null
   preferencesMenuItem: null
+  helpMenuItem: null
   signOutMenuItem: null
   quitMenuItem: null
 
@@ -24,6 +25,7 @@ App.TrayMenuView = Em.View.extend
       openFolderMenuItem:  openFolderMenuItem  = new gui.MenuItem(label: 'Open Nitrous Folder...')
       openWebMenuItem:     openWebMenuItem     = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
       preferencesMenuItem: preferencesMenuItem = new gui.MenuItem(label: 'Preferences...')
+      helpMenuItem:        helpMenuItem        = new gui.MenuItem(label: 'Help')
       signOutMenuItem:     signOutMenuItem     = new gui.MenuItem(label: 'Sign Out')
       quitMenuItem:        quitMenuItem        = new gui.MenuItem(label: 'Quit Nitrous Desktop')
 
@@ -51,6 +53,9 @@ App.TrayMenuView = Em.View.extend
       win.focus()
       App.mixpanel?.track 'Opened Preferences'
 
+    helpMenuItem.click = ->
+      gui.Shell.openExternal 'http://help.nitrous.io/nitrous-desktop/'
+
     signOutMenuItem.click = ->
       App.trigger 'SignOut'
 
@@ -65,6 +70,8 @@ App.TrayMenuView = Em.View.extend
     mainMenu.append(openWebMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(preferencesMenuItem)
+    mainMenu.append(new gui.MenuItem type: 'separator')
+    mainMenu.append(helpMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(signOutMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
