@@ -95,7 +95,7 @@ task :compile do
   end
   sprockets.context_class.class_eval do
     def config
-      @config_json ||= load_config
+      @config_json ||= config_json
     end
   end
 
@@ -175,7 +175,8 @@ task :build => [:clean, :compile] do
   execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
   if @target == 'production'
-    #filename = "NitrousDesktop-#{@target}-#{load_config['app_version']}"
+    app_version = config_json['app_version']
+    #filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
     #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
 
     #puts "=> build/#{@target}/#{filename}.zip"
@@ -183,12 +184,18 @@ task :build => [:clean, :compile] do
     execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
     execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
 
-    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(app_dir, 'Contents')
+    info_plist_path = File.join(app_dir, 'Contents', 'Info.plist')
+    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), info_plist_path
+    execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", info_plist_path
+
     execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'), resources_dir
     execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
 
-    execute 'codesign', '--deep', '-f', '-s', 'Developer ID Application: Jihoon Kim', app_dir
-    execute 'codesign', '-vvv', app_dir
+    sig = 'Developer ID Application: Jihoon Kim'
+    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
+    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')
+    execute "find '#{app_dir}' -name *.dylib | xargs -I $ codesign -f -v -s '#{sig}' $"
+    execute 'codesign', '--deep', '-f', '-v', '-s', sig, app_dir
   end
 end
 
@@ -207,8 +214,8 @@ def execute(*args)
   system(*args)
 end
 
-def load_config
-  if json = JSON.parse(File.read(File.join(ROOT_DIR, 'config.json')))
+def config_json
+  @config_json ||= if json = JSON.parse(File.read(File.join(ROOT_DIR, 'config.json')))
     json = json[ENV['TARGET']]
     json['environment'] = ENV['TARGET']
     json
