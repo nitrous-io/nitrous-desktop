@@ -56,7 +56,7 @@ window.App = NitrousDesktop.create
         cb?()
 
   clearAccessTokenAndRestart: ->
-    App.AccessToken.removeFromStorage()
+    App.localStorage.clear()
     gui.Window.open appURL,
       show: false
       toolbar: false
