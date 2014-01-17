@@ -20,9 +20,12 @@ App.MainRoute = Em.Route.extend
     App.Region.find()
     @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
     controller.checkKeyPairRequirement =>
-      @controllerFor('boxesList').set 'model', App.Box.find()
+      boxesListController = @controllerFor 'boxesList'
+      boxesListController.set 'model', boxes = App.Box.find()
+      boxes.one 'didLoad', (boxes) ->
+        boxesListController.selectFirstItem()
       @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
-      publicKeys.one 'didLoad', (key) =>
+      publicKeys.one 'didLoad', =>
         controller.checkPublicKeyRequirement =>
           @controllerFor('update').check()
 

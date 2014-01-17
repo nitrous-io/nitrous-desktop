@@ -4,3 +4,7 @@ App.BoxesListController = Em.ArrayController.extend
   selectItem: (item) ->
     @set 'selectedItem', item
     @send 'boxSelected', item
+
+  selectFirstItem: ->
+    if firstItem = @get 'firstObject'
+      @selectItem firstItem
