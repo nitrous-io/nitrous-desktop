@@ -17,7 +17,8 @@ Em.Test.registerHelper 'thenCheck', (app, done, f) ->
 
 App.setupForTesting()
 App.injectTestHelpers()
-App.set 'config.mixpanelToken', null
+Em.run ->
+  App.set 'config.mixpanelToken', null
 
 # don't wait for pending ajax requests
 delete $._data(document, 'events').ajaxStart
