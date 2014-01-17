@@ -5,7 +5,7 @@ fs = require 'fs'
 os = require 'os'
 path = require 'path'
 
-IGNORE_LIST = 'Name {.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
+IGNORE_LIST = 'Name {.unison,.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
 SETICON_BIN_PATH = path.join(appPath, 'programs', 'seticon')
 UNISON_BIN_PATH = path.join(appPath, 'programs',
   "nitrous-unison#{if os.type() == 'Windows_NT' then '.exe' else ''}")
@@ -123,10 +123,10 @@ App.FileSync = klass = Em.Object.extend
       App.mixpanel?.track 'File Sync Stopped Monitoring', box_id: @get('box.id')
       watcher.stop()
       @set 'watcher', null
-    if process = @get 'process'
+    if proc = @get 'process'
       @set 'process', null
       console.log 'File Sync: killing process'
-      process.kill()
+      proc.kill()
 
     @set 'started', false
 
@@ -173,19 +173,23 @@ App.FileSync = klass = Em.Object.extend
             '-terse' # reduce output
           ]
 
+          # place archives file in localPath/.unison
+          env = _.defaults UNISON: path.join(localPath, '.unison'), process.env
+
           options =
             cwd: homePath
             detached: false
+            env: env
 
           if !exists || @get 'shouldIgnoreArchives'
             @set 'shouldIgnoreArchives', false
             args.push '-ignorearchives'
 
           console.log 'File Sync: syncing...'
-          @set 'process', process = childProcess.spawn UNISON_BIN_PATH, args, options
-          process.stdout.on 'data', (data) => @_processOutput(data)
-          process.stderr.on 'data', (data) => @_processOutput(data)
-          process.on 'exit', (code) => @_processDidExit(code, cb)
+          @set 'process', proc = childProcess.spawn UNISON_BIN_PATH, args, options
+          proc.stdout.on 'data', (data) => @_processOutput(data)
+          proc.stderr.on 'data', (data) => @_processOutput(data)
+          proc.on 'exit', (code) => @_processDidExit(code, cb)
 
   _processOutput: (data) ->
     data = data.toString('utf8')

@@ -133,33 +133,33 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       args = args.concat ['-L', "#{port}/localhost/#{port}"]
 
     console.log 'Port Forwarding: connecting...'
-    @set 'process', process = childProcess.spawn(SSH_BIN_PATH, args, options)
-    process.stdout.on 'data', (data) => @_processOutput(data)
-    process.stderr.on 'data', (data) => @_processOutput(data)
-    process.on 'exit', (code) =>
+    @set 'process', proc = childProcess.spawn(SSH_BIN_PATH, args, options)
+    proc.stdout.on 'data', (data) => @_processOutput(data)
+    proc.stderr.on 'data', (data) => @_processOutput(data)
+    proc.on 'exit', (code) =>
       console.log "Port Forwarding: process exited with code #{code}"
       @set 'process', null
       @set 'connected', false
 
   _stopPortForwarding: ->
     @set 'lastErrorMessage', null
-    process = @get 'process'
+    proc = @get 'process'
     retrySchedule = @get 'retrySchedule'
-    if process || retrySchedule
+    if proc || retrySchedule
       console.log "Port Forwarding: stop #{@get 'box.name'}"
       App.mixpanel?.track 'SSH Tunnel Destroyed', box_id: @get('box.id')
       if retrySchedule
         Em.run.cancel(retrySchedule)
         @set 'retrySchedule', null
-      if process
+      if proc
         @_killProcess()
 
   _killProcess: ->
     @set 'connected', false
-    if process = @get 'process'
+    if proc = @get 'process'
       console.log 'Port Forwarding: killing process'
       @set 'process', null
-      process.kill()
+      proc.kill()
     @set 'started', false
 
   _scheduleRetry: (delay) ->
