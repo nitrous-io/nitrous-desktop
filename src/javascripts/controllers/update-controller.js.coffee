@@ -93,7 +93,7 @@ App.UpdateController = klass = Em.Controller.extend
       port: parsedURL.port ? (if isHTTPS then 443 else 80)
       path: parsedURL.path
       headers:
-        'user-agent': App.utility.userAgent()
+        'user-agent': window.navigator.userAgent
         accept: '*/*'
 
     if isHTTPS && App.get('config.environment') == 'development'

@@ -42,9 +42,6 @@ App.utility =
           window.encodeURIComponent(path)
         ])
 
-  userAgent: ->
-    "Nitrous Desktop/#{App.get 'config.appVersion'} (#{os.type()} #{os.release()}; #{os.platform()}; #{os.arch()}) Node.js/#{process.versions.node} node-webkit/#{process.versions['node-webkit']} Chromium/#{process.versions.chromium}"
-
   executablePath: ->
     switch os.type()
       when 'Darwin'

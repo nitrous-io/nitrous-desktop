@@ -1,5 +1,6 @@
 {
   "name": "nitrous-desktop"
+, "version": "APP_VERSION"
 , "main": "index.html"
 , "window": {
     "show": false
@@ -7,6 +8,7 @@
   , "width": 320
   , "height": 480
   }
+, "user-agent": "NitrousDesktop/%ver (%osinfo) node-webkit/%nwver webkit/%webkit_ver"
 , "dependencies": {
   }
 , "devDependencies": {

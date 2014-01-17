@@ -137,6 +137,7 @@ task :build => [:clean, :compile] do
   puts "=> Building #{@target}..."
   compiled_dir = File.join BUILD_DIR, @target
   FileUtils.mkpath compiled_dir
+  app_version = config_json['app_version']
 
   if @target == 'production'
     node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'node-webkit.app')
@@ -170,12 +171,12 @@ task :build => [:clean, :compile] do
   @resources.each do |resource|
     execute 'cp', '-RP', File.join(SOURCE_DIR, resource), compiled_dir
   end
+  execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", File.join(compiled_dir, 'package.json')
 
   # copy font-awesome fonts
   execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
   if @target == 'production'
-    app_version = config_json['app_version']
     #filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
     #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
 
