@@ -25,9 +25,9 @@ App.utility =
   withDataFolder: (cb) ->
     switch os.type()
       when 'Windows_NT'
-        dataFolder = path.join process.env.APPDATA, 'Nitrous Desktop'
+        dataFolder = path.join process.env.APPDATA, 'nitrous-desktop'
       when 'Darwin'
-        dataFolder = path.join process.env.HOME, 'Library', 'Application Support', 'Nitrous Desktop'
+        dataFolder = path.join process.env.HOME, 'Library', 'Application Support', 'nitrous-desktop'
       else
         dataFolder = path.join process.env.HOME, '.nitrous-desktop'
     fs.mkdir dataFolder, ->
