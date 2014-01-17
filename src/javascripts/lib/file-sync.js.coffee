@@ -6,8 +6,14 @@ os = require 'os'
 path = require 'path'
 
 IGNORE_LIST = 'Name {.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
+SETICON_BIN_PATH = path.join(appPath, 'programs', 'seticon')
 UNISON_BIN_PATH = path.join(appPath, 'programs',
   "nitrous-unison#{if os.type() == 'Windows_NT' then '.exe' else ''}")
+
+FOLDER_ICON_PATH = if os.type() == 'Darwin'
+  path.join(appPath, 'resources', 'images', 'NitrousFolderIcon.icns')
+else
+  null
 
 RETRY_DELAY = 10000 # milliseconds
 
@@ -95,6 +101,8 @@ App.FileSync = klass = Em.Object.extend
     console.log "File Sync: start watching #{boxName} - #{boxPath}"
     App.mixpanel?.track 'File Sync Started Monitoring', box_id: @get('box.id')
     fs.mkdir nitrousPath, '0755', (err) =>
+      if !err && os.type() == 'Darwin'
+        childProcess.execFile SETICON_BIN_PATH, [FOLDER_ICON_PATH, nitrousPath]
       fs.mkdir boxPath, '0755', (err) =>
         @set 'watcher', watcher = new App.Watcher(nitrousPath)
         watcher.on 'change', =>
@@ -198,7 +206,6 @@ App.FileSync = klass = Em.Object.extend
       @set 'shouldRetryWithDelay', 500
     else if transferCount = data.match(/Synchronization complete at .+ \(([\d,]+) items? transferred/)?[1]
       @set 'transferCount', window.parseInt(transferCount.replace(/,/g, ''), 10)
-      App.mixpanel?.track 'File Sync Performed', box_id: @get('box.id')
 
   _processDidExit: (code, cb) ->
     console.log "File Sync: process exited with code #{code}"
@@ -217,8 +224,7 @@ App.FileSync = klass = Em.Object.extend
     else
       if transferCount = @get 'transferCount'
         console.log "File Sync: #{transferCount} item#{if transferCount > 1 then 's' else ''} transferred"
-        # TODO: notify completion
-        # TODO: mixpanel
+        App.mixpanel?.track 'File Sync Performed', box_id: @get('box.id')
 
       if @get('shouldSyncAgain')
         @performSync(cb)

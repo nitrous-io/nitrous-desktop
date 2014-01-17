@@ -193,6 +193,7 @@ task :build => [:clean, :compile] do
 
     sig = 'Developer ID Application: Jihoon Kim'
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
+    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')
     execute "find '#{app_dir}' -name *.dylib | xargs -I $ codesign -f -v -s '#{sig}' $"
     execute 'codesign', '--deep', '-f', '-v', '-s', sig, app_dir
