@@ -1,7 +1,7 @@
 #sidebar
   .lists
     = outlet boxesList
-    = outlet publicKeysList
+    /= outlet publicKeysList
 #main
   #content
     = outlet content
