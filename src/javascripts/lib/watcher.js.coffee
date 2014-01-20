@@ -18,7 +18,7 @@ class App.Watcher extends EventEmitter
     if @notifyTimeout == null && !@_shouldIgnore(path)
       @notifyTimeout = window.setTimeout(=>
         @notifyTimeout = null
-        @emit 'change'
+        @emit 'change', path
       , @delay)
 
   _clearNotifyTimeout: ->

@@ -105,8 +105,9 @@ App.FileSync = klass = Em.Object.extend
         childProcess.execFile SETICON_BIN_PATH, [FOLDER_ICON_PATH, nitrousPath]
       fs.mkdir boxPath, '0755', (err) =>
         @set 'watcher', watcher = new App.Watcher(nitrousPath)
-        watcher.on 'change', =>
-          @performSync()
+        watcher.on 'change', (changedPath) =>
+          unless changedPath.indexOf(path.join(boxPath, '.unison')) == 0
+            @performSync()
         # perform initial sync
         @performSync =>
           watcher.start()
