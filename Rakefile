@@ -196,12 +196,15 @@ task :build => [:clean, :compile] do
 
     sig = 'C8A9B7D71AF2234D0542582FE4461EF1E9D403F1'
     execute "find '#{app_dir}' -name .DS_Store | xargs -I $ rm -f $"
+
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')
     execute "find '#{app_dir}' -name *.dylib | xargs -I $ codesign -f -v -s '#{sig}' $"
     execute "find '#{app_dir}' -name *.so | xargs -I $ codesign -f -v -s '#{sig}' $"
-    execute 'codesign', '--deep', '-f', '-v', '-s', sig, app_dir
+    execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.tmp')
+    execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.TOC')
+    execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
   end
 end
 
