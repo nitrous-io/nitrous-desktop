@@ -10,6 +10,7 @@ url = require 'url'
 APPCAST_URL = "#{App.get 'config.host'}/mac/appcast.xml"
 UPDATE_SCRIPT_PATH = path.join(appPath, 'programs',
   "nitrous-update.#{if os.type() == 'Windows_NT' then 'bat' else 'sh'}")
+UPDATE_CHECK_INTERVAL = 6 * 60 * 60 * 1000  # 6 hours
 
 App.UpdateController = klass = Em.Controller.extend
   needs: ['modal']
@@ -22,6 +23,12 @@ App.UpdateController = klass = Em.Controller.extend
   updateFailed: false
   downloading: false
   downloadedBytes: 0
+
+  beginPeriodicChecking: ->
+    @check()
+    window.setInterval(=>
+      @check()
+    , UPDATE_CHECK_INTERVAL)
 
   check: ->
     unless @get 'checking'

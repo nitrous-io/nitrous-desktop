@@ -27,7 +27,7 @@ App.MainRoute = Em.Route.extend
       @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
       publicKeys.one 'didLoad', =>
         controller.checkPublicKeyRequirement =>
-          @controllerFor('update').check()
+          @controllerFor('update').beginPeriodicChecking()
 
   activate: ->
     win = gui.Window.get()
