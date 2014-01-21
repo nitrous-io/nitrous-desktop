@@ -1,4 +1,5 @@
 gui = require 'nw.gui'
+win = gui.Window.get()
 screen = window.screen
 
 App.MainRoute = Em.Route.extend
@@ -6,35 +7,44 @@ App.MainRoute = Em.Route.extend
     if !App.get('accessToken')
       @transitionTo 'index'
 
-  model: ->
-    App.CurrentUser.reload()
-
   renderTemplate: ->
     @_super()
     @render 'boxesList',      into: 'main', outlet: 'boxesList',      controller: 'boxesList'
     @render 'publicKeysList', into: 'main', outlet: 'publicKeysList', controller: 'publicKeysList'
 
   setupController: (controller, model) ->
-    @_super(controller, model)
-    App.BoxTemplate.find()
-    App.Region.find()
-    @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
-    controller.checkKeyPairRequirement =>
-      boxesListController = @controllerFor 'boxesList'
-      boxesListController.set 'model', boxes = App.Box.find()
-      boxes.one 'didLoad', ->
-        boxesListController.selectFirstItem()
-      @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
-      publicKeys.one 'didLoad', =>
-        controller.checkPublicKeyRequirement =>
-          @controllerFor('update').beginPeriodicChecking()
+    @_super.apply this, arguments
+    @loadModels(controller)
+
+  loadModels: (controller) ->
+    userId = App.get 'accessToken.resourceOwnerId'
+    App.CurrentUser.fetch(userId).then((currentUser) =>
+      App.set 'currentUser', currentUser
+      controller.connectToShover()
+      App.BoxTemplate.find()
+      App.Region.find()
+      @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
+      controller.checkKeyPairRequirement =>
+        boxesListController = @controllerFor 'boxesList'
+        boxesListController.set 'model', boxes = App.Box.find()
+        boxes.one 'didLoad', ->
+          boxesListController.selectFirstItem()
+        @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
+        publicKeys.one 'didLoad', =>
+          controller.checkPublicKeyRequirement =>
+            @controllerFor('update').beginPeriodicChecking()
+    , (jqXHR) =>
+      Em.run.later(=>
+        @loadModels(controller)
+      , 5000)
+      jqXHR
+    ).then ->
+      win.show()
 
   activate: ->
-    win = gui.Window.get()
     win.hide()
     App.windowHelper.resizeAndMoveToCenter(800, 500)
     win.setResizable true
-    win.show()
 
   actions:
     boxSelected: (box) ->

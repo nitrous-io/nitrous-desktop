@@ -23,5 +23,4 @@ App.CurrentUser = klass = App.BaseModel.extend
 klass.reopenClass
   adapter: App.SingletonAdapter.create()
   rootKey: 'user'
-  primaryKey: 'noKey' # ignore primary key since it's a singleton resource
   url: "#{App.get 'config.host'}/api/v0/user"

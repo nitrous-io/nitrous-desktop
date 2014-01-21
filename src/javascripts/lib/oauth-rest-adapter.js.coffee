@@ -18,10 +18,5 @@ App.OAuthRESTAdapter = Em.RESTAdapter.extend
     recordClass = record.constructor
     urlRoot = recordClass.url
     id = record.get(recordClass.primaryKey)
-
-    url = if Em.isEmpty(id)
-      "#{urlRoot}/#{action}.json"
-    else
-      "#{urlRoot}/#{id}/#{action}.json"
-
+    url = @buildURL(recordClass, id).replace /\.json$/, "/#{action}.json"
     @ajax url, params, method

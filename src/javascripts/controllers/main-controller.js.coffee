@@ -1,12 +1,6 @@
 App.MainController = Em.Controller.extend
   needs: ['preferences', 'publicKeysList', 'modal']
-  modelBinding: 'App.currentUser'
   shoverSocket: null
-
-  didObtainCurrentUser: (->
-    if @get('model.id')
-      @connectToShover() if @get('model.id')
-  ).observes 'model.id'
 
   connectToShover: ->
     @set 'shoverSocket', shoverSocket = AIO.ShoverSocket.create(serverURIBinding: 'App.config.shoverServerURI')

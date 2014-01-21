@@ -25,7 +25,6 @@ App.PreferencesController = Em.Controller.extend
           cb?()
         App.mixpanel?.track 'Generated SSH Key Pair'
 
-
   registerPublicKey: ->
     if key = @get 'keyPair.publicKey'
       @set 'publicKeyRegistrationResult', null
