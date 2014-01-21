@@ -22,7 +22,7 @@ App.MainRoute = Em.Route.extend
     controller.checkKeyPairRequirement =>
       boxesListController = @controllerFor 'boxesList'
       boxesListController.set 'model', boxes = App.Box.find()
-      boxes.one 'didLoad', (boxes) ->
+      boxes.one 'didLoad', ->
         boxesListController.selectFirstItem()
       @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
       publicKeys.one 'didLoad', =>

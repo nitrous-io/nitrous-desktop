@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Licenses</title>
+  <meta content='Nitrous.IO' name='author'>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      border-top: 1px solid #6a6a6a;
+      overflow: hidden;
+      background: #ededed;
+    }
+
+    html.blurred {
+      border-top: 1px solid #a8a8a8;
+    }
+
+    html, body, body > div {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+    }
+
+    body > div {
+      overflow-y: scroll;
+      border: 1px solid #bebebe;
+      border-top-color: #8e8e8e;
+    }
+
+    #licenses {
+      margin: 0;
+      padding: 5px;
+      white-space: pre-wrap;
+      background: #fff;
+      font-family: Menlo, Monaco, 'Andale Mono', Consolas, monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <pre id='licenses'></pre>
+  </div>
+  <script>
+    (function() {
+      var gui = require('nw.gui'),
+          win = gui.Window.get(),
+          appPath = require('app-path'),
+          path = require('path'),
+          fs = require('fs');
+
+      var htmlElement = document.getElementsByTagName('html')[0];
+
+      win.on('focus', function() {
+        htmlElement.className = '';
+      });
+
+      win.on('blur', function() {
+        htmlElement.className = 'blurred';
+      });
+
+      fs.readFile(path.join(appPath, 'LICENSES'), { encoding: 'utf8' }, function(err, data) {
+        if (err || !data) {
+          return;
+        }
+        document.getElementById('licenses').textContent = data;
+      });
+
+      win.show();
+      win.focus();
+    }).call(this);
+  </script>
+</body>
+</html>

@@ -22,6 +22,8 @@ SPEC_DIR = "spec/"
 @resources = %w(
   favicon.ico
   index.html
+  licenses.html
+  LICENSES
   package.json
   resources
 )
@@ -193,6 +195,7 @@ task :build => [:clean, :compile] do
     execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
 
     sig = 'C8A9B7D71AF2234D0542582FE4461EF1E9D403F1'
+    execute "find '#{app_dir}' -name .DS_Store | xargs -I $ rm -f $"
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')

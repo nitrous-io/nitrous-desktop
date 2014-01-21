@@ -1,3 +1,5 @@
+gui = require 'nw.gui'
+
 App.PreferencesController = Em.Controller.extend
   needs: ['update']
   userBinding: 'App.currentUser'
@@ -7,6 +9,8 @@ App.PreferencesController = Em.Controller.extend
   scanning: false
   keyPairGenerationResult: null
   publicKeyRegistrationResult: null
+
+  licensesWindow: null
 
   generateKeyPair: (cb) ->
     @set 'keyPairGenerationResult', null
@@ -39,6 +43,22 @@ App.PreferencesController = Em.Controller.extend
 
     checkForUpdate: ->
       @get('controllers.update').check()
+
+    showLicenses: ->
+      licensesWindow = @get 'licensesWindow'
+      unless licensesWindow
+        licensesURL = (location.origin + location.pathname).replace /index\.html$/, 'licenses.html'
+        licensesWindow = gui.Window.open licensesURL,
+          show: false
+          title: 'Licenses'
+          toolbar: false
+          focus: true
+        licensesWindow.setAlwaysOnTop true
+        licensesWindow.on 'close', =>
+          @set 'licensesWindow', null
+          licensesWindow.close true
+        @set 'licensesWindow', licensesWindow
+      licensesWindow.focus()
 
     rescanKeyPair: ->
       @set 'scanning', true

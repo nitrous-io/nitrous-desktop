@@ -51,6 +51,11 @@
   .info-row
     .left
     .right
+      button.btn.btn-white click='showLicenses' Licenses
+
+  .info-row
+    .left
+    .right
       h4 SSH Key Pair
 
   .info-row
