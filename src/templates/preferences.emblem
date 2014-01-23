@@ -7,20 +7,6 @@
   .info-row
     .left
     .right
-      h4 Account
-
-  .info-row
-    .left Username
-    .right
-      p
-        | {{ user.username }}
-        if user.fullName
-          | ({{ user.fullName}})
-      button.btn.btn-white click='signOut' Sign Out
-
-  .info-row
-    .left
-    .right
       h4 General
 
   /.info-row
@@ -30,6 +16,12 @@
         label
           input type="checkbox"
           | Launch Nitrous Desktop Automatically
+
+  .info-row
+    .left
+      | Version
+    .right
+      = App.config.appVersion
 
   .info-row
     .left
@@ -52,6 +44,21 @@
     .left
     .right
       button.btn.btn-white click='showLicenses' Licenses
+
+
+  .info-row
+    .left
+    .right
+      h4 Account
+
+  .info-row
+    .left Username
+    .right
+      p
+        | {{ user.username }}
+        if user.fullName
+          | ({{ user.fullName}})
+      button.btn.btn-white click='signOut' Sign Out
 
   .info-row
     .left
