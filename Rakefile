@@ -229,6 +229,7 @@ def config_json
   @config_json ||= if json = JSON.parse(File.read(File.join(ROOT_DIR, 'config.json')))
     json = json[ENV['TARGET']]
     json['environment'] = ENV['TARGET']
+    json['app_version'] = File.read(File.join(ROOT_DIR, 'VERSION')).strip
     json
   end
 end
