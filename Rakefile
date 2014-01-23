@@ -197,6 +197,8 @@ task :build => [:clean, :compile] do
     sig = 'C8A9B7D71AF2234D0542582FE4461EF1E9D403F1'
     execute "find '#{app_dir}' -name .DS_Store | xargs -I $ rm -f $"
 
+    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-update.sh')
+    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison.sh')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
     execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')

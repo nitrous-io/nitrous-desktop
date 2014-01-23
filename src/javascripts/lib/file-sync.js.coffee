@@ -7,8 +7,8 @@ path = require 'path'
 
 IGNORE_LIST = 'Name {.unison,.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
 SETICON_BIN_PATH = path.join(appPath, 'programs', 'seticon')
-UNISON_BIN_PATH = path.join(appPath, 'programs',
-  "nitrous-unison#{if os.type() == 'Windows_NT' then '.exe' else ''}")
+UNISON_SCRIPT_PATH = path.join(appPath, 'programs',
+  "nitrous-unison#{if os.type() == 'Windows_NT' then '.bat' else '.sh'}")
 
 FOLDER_ICON_PATH = if os.type() == 'Darwin'
   path.join(appPath, 'resources', 'images', 'NitrousFolderIcon.icns')
@@ -138,7 +138,7 @@ App.FileSync = klass = Em.Object.extend
     @set 'shouldRetryWithDelay', false
 
     if @get 'syncing'
-      console.log 'File Sync: already syncing, will run sync again'
+      console.log 'File Sync: sync requested while syncing, will run sync again later'
       @set 'shouldSyncAgain', true
       cb?()
     else
@@ -158,6 +158,7 @@ App.FileSync = klass = Em.Object.extend
           ]
 
           args = [
+            UNISON_SCRIPT_PATH
             localPath
             remotePath
             '-ui', 'text'
@@ -187,7 +188,7 @@ App.FileSync = klass = Em.Object.extend
             args.push '-ignorearchives'
 
           console.log 'File Sync: syncing...'
-          @set 'process', proc = childProcess.spawn UNISON_BIN_PATH, args, options
+          @set 'process', proc = childProcess.spawn '/bin/bash', args, options
           proc.stdout.on 'data', (data) => @_processOutput(data)
           proc.stderr.on 'data', (data) => @_processOutput(data)
           proc.on 'exit', (code) => @_processDidExit(code, cb)
