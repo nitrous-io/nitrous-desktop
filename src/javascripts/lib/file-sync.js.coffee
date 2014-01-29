@@ -5,7 +5,7 @@ fs = require 'fs'
 os = require 'os'
 path = require 'path'
 
-IGNORE_LIST = 'Name {.unison,.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.sw?,._*,*~}'
+IGNORE_LIST = 'Name {.unison,.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.pid,*.sw?,._*,*~}'
 SETICON_BIN_PATH = path.join(appPath, 'programs', 'seticon')
 UNISON_SCRIPT_PATH = path.join(appPath, 'programs',
   "nitrous-unison#{if os.type() == 'Windows_NT' then '.bat' else '.sh'}")
@@ -32,6 +32,7 @@ App.FileSync = klass = Em.Object.extend
   watcher: null
   shouldSyncAgain: false
   shouldIgnoreArchives: false
+  shouldIgnoreLocks: false
   shouldRetryWithDelay: false # bool or milliseconds, if true, use default delay (RETRY_DELAY)
   transferCount: null
   lastErrorMessage: null
@@ -188,6 +189,10 @@ App.FileSync = klass = Em.Object.extend
             @set 'shouldIgnoreArchives', false
             args.push '-ignorearchives'
 
+          if @get 'shouldIgnoreLocks'
+            @set 'shouldIgnoreLocks', false
+            args.push '-ignorelocks'
+
           console.log 'File Sync: syncing...'
           @set 'process', proc = childProcess.spawn '/bin/bash', args, options
           proc.stdout.on 'data', (data) => @_processOutput(data)
@@ -202,6 +207,10 @@ App.FileSync = klass = Em.Object.extend
          errorMessage.indexOf('on-disk archives are not identical') != -1
         @set 'lastErrorMessage', 'Inconsistent state'
         @set 'shouldIgnoreArchives', true
+        @set 'shouldRetryWithDelay', 500
+      else if errorMessage.indexOf('Warning: the archives are locked.') != -1
+        @set 'lastErrorMessage', 'Archives are locked'
+        @set 'shouldIgnoreLocks', true
         @set 'shouldRetryWithDelay', 500
       else if errorMessage.indexOf('Lost connection with the server') != -1
         @set 'lastErrorMessage', 'Connection failed'
