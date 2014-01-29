@@ -104,9 +104,10 @@ App.FileSync = klass = Em.Object.extend
       if !err && os.type() == 'Darwin'
         childProcess.execFile SETICON_BIN_PATH, [FOLDER_ICON_PATH, nitrousPath]
       fs.mkdir boxPath, '0755', (err) =>
-        @set 'watcher', watcher = new App.Watcher(nitrousPath)
+        @set 'watcher', watcher = new App.Watcher(boxPath)
         watcher.on 'change', (changedPath) =>
           unless changedPath.indexOf(path.join(boxPath, '.unison')) == 0
+            console.log "File Sync: detected change: #{changedPath}"
             @performSync()
         # perform initial sync
         @performSync =>
