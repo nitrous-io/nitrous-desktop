@@ -80,6 +80,13 @@ App.FileSync = klass = Em.Object.extend
         enabled: @get 'enabled'
   ).observes 'enabled'
 
+  _updateSyncCount: (->
+    if @get('syncing')
+      App.incrementProperty 'syncCount'
+    else
+      App.decrementProperty 'syncCount'
+  ).observes 'syncing'
+
   _startOrStopWatching: (->
     if @get('enabled') && (@get('box.state') == 'running') && App.get('online')
       if nitrousPath

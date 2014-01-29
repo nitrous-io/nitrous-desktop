@@ -29,6 +29,7 @@ window.NitrousDesktop = Em.Application.extend Ember.Evented,
   userSignedIn: Em.computed.notEmpty 'currentUser'
   applicationView: null
   mixpanel: null
+  syncCount: 0
 
   reset: ->
     @setProperties
