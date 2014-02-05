@@ -34,18 +34,23 @@ desc "Setup development environment"
 task :setup do |t|
   puts "=> Initializing Submodules..."
   execute 'git', 'submodule', 'update', '--init'
-  puts "=> Downloading node-webkit #{NODE_WEBKIT_VERSION} for OS X..."
   node_webkit_dir = File.join(ROOT_DIR, 'node-webkit')
   FileUtils.mkpath node_webkit_dir
 
   Dir.chdir node_webkit_dir do
-    filename = "node-webkit-v#{NODE_WEBKIT_VERSION}-osx-ia32.zip"
-    execute 'curl', "https://s3.amazonaws.com/node-webkit/v#{NODE_WEBKIT_VERSION}/#{filename}", '-o', filename
-    FileUtils.mkdir_p NODE_WEBKIT_VERSION
-    execute 'unzip', filename, '-d', NODE_WEBKIT_VERSION
-    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents')
-    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'),  File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents', 'Resources')
-    execute 'rm', '-f', File.join(NODE_WEBKIT_VERSION, 'node-webkit.app', 'Contents', 'Resources', 'nw.icns')
+    %w(osx win).each do |arch|
+      puts "=> Downloading node-webkit #{NODE_WEBKIT_VERSION} for #{arch}..."
+      filename = "node-webkit-v#{NODE_WEBKIT_VERSION}-#{arch}-ia32.zip"
+      execute 'curl', "https://s3.amazonaws.com/node-webkit/v#{NODE_WEBKIT_VERSION}/#{filename}", '-o', filename
+      dir = File.join(NODE_WEBKIT_VERSION, arch)
+      FileUtils.mkdir_p dir
+      execute 'unzip', filename, '-d', dir
+      if arch == 'osx'
+        execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), File.join(dir, 'node-webkit.app', 'Contents')
+        execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'),  File.join(dir, 'node-webkit.app', 'Contents', 'Resources')
+        execute 'rm', '-f', File.join(dir, 'node-webkit.app', 'Contents', 'Resources', 'nw.icns')
+      end
+    end
   end
 
   puts "=> Compiling FSEvents native module..."
@@ -62,7 +67,7 @@ task :run do |t|
     Rake::Task["build"].invoke
   end
   puts "=> Running #{@target}..."
-  execute "node-webkit/#{NODE_WEBKIT_VERSION}/node-webkit.app/Contents/MacOS/node-webkit", File.join(BUILD_DIR, @target)
+  execute "node-webkit/#{NODE_WEBKIT_VERSION}/osx/node-webkit.app/Contents/MacOS/node-webkit", File.join(BUILD_DIR, @target, 'osx')
 end
 
 desc 'Watch for changes'
@@ -122,6 +127,7 @@ task :compile do
   if @target == 'development'
     bundles.concat %w(spec.html spec.js spec.css)
   end
+
   bundles.each do |bundle|
     asset = sprockets.find_asset(bundle)
     prefix = asset.pathname.to_s.split('/')[-2]
@@ -130,83 +136,96 @@ task :compile do
       prefix = ''
     end
 
-    FileUtils.mkpath File.join(BUILD_DIR, @target, prefix)
-    asset.write_to File.join(BUILD_DIR, @target, prefix, bundle)
+    %w(osx win).each do |arch|
+      FileUtils.mkpath File.join(BUILD_DIR, @target, arch, prefix)
+      asset.write_to File.join(BUILD_DIR, @target, arch, prefix, bundle)
+    end
   end
 end
 
 task :build => [:clean, :compile] do
-  puts "=> Building #{@target}..."
-  compiled_dir = File.join BUILD_DIR, @target
-  FileUtils.mkpath compiled_dir
   app_version = config_json['app_version']
-
-  if @target == 'production'
-    node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'node-webkit.app')
-    execute 'cp', '-RP', node_webkit_app_dir, compiled_dir
-    app_dir = File.join(compiled_dir, 'Nitrous Desktop.app')
-    execute 'mv', File.join(compiled_dir, 'node-webkit.app'), app_dir
-
+  %w(osx win).each do |arch|
+    puts "=> Building #{@target} for #{arch}..."
+    compiled_dir = File.join BUILD_DIR, @target, arch
     target_dir = compiled_dir
-    resources_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources')
-    compiled_dir = File.join(resources_dir, 'app.nw')
     FileUtils.mkpath compiled_dir
-  end
 
-  # copy fsevents module
-  modules_dir = File.join(compiled_dir, 'node_modules')
-  fsevents_dir = File.join(modules_dir, 'fsevents')
-  fsevents_release_dir = File.join(fsevents_dir, 'build', 'Release')
-  FileUtils.mkpath fsevents_release_dir
-  %w(fsevents.js LICENSE package.json).each do |file|
-    execute 'cp', File.join(VENDOR_DIR, 'fsevents', file), fsevents_dir
-  end
-  execute 'cp', File.join(VENDOR_DIR, 'fsevents', 'build', 'Release', 'fswatch.node'), fsevents_release_dir
+    if @target == 'production' && arch == 'osx'
+      node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'osx', 'node-webkit.app')
+      execute 'cp', '-RP', node_webkit_app_dir, compiled_dir
+      app_dir = File.join(compiled_dir, 'Nitrous Desktop.app')
+      execute 'mv', File.join(compiled_dir, 'node-webkit.app'), app_dir
 
-  # copy other modules
-  execute 'cp', '-RP', File.join(VENDOR_DIR, 'app-path'), modules_dir
+      resources_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources')
+      compiled_dir = File.join(resources_dir, 'app.nw')
+      FileUtils.mkpath compiled_dir
+    end
 
-  # copy programs
-  execute 'cp', '-RP', File.join(VENDOR_DIR, 'programs'), compiled_dir
+    modules_dir = File.join(compiled_dir, 'node_modules')
+    FileUtils.mkpath modules_dir
 
-  # copy other resources
-  @resources.each do |resource|
-    execute 'cp', '-RP', File.join(SOURCE_DIR, resource), compiled_dir
-  end
-  execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", File.join(compiled_dir, 'package.json')
+    # copy some other required files
+    execute 'cp', '-RP', File.join(VENDOR_DIR, 'app-path'), modules_dir
 
-  # copy font-awesome fonts
-  execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
+    # copy programs
+    execute 'cp', '-RP', File.join(VENDOR_DIR, 'programs', arch), File.join(compiled_dir, 'programs')
 
-  if @target == 'production'
-    #filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
-    #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
+    if arch == 'osx'
+      # copy fsevents module
+      fsevents_dir = File.join(modules_dir, 'fsevents')
+      fsevents_release_dir = File.join(fsevents_dir, 'build', 'Release')
+      FileUtils.mkpath fsevents_release_dir
+      %w(fsevents.js LICENSE package.json).each do |file|
+        execute 'cp', File.join(VENDOR_DIR, 'fsevents', file), fsevents_dir
+      end
+      execute 'cp', File.join(VENDOR_DIR, 'fsevents', 'build', 'Release', 'fswatch.node'), fsevents_release_dir
+    end
 
-    #puts "=> build/#{@target}/#{filename}.zip"
+    # copy other resources
+    @resources.each do |resource|
+      execute 'cp', '-RP', File.join(SOURCE_DIR, resource), compiled_dir
+    end
+    execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", File.join(compiled_dir, 'package.json')
 
-    execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
-    execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
+    # copy font-awesome fonts
+    execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
-    info_plist_path = File.join(app_dir, 'Contents', 'Info.plist')
-    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), info_plist_path
-    execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", info_plist_path
+    if @target == 'production'
+      #filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
+      #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
 
-    execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'), resources_dir
-    execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
+      #puts "=> build/#{@target}/#{filename}.zip"
 
-    sig = 'C8A9B7D71AF2234D0542582FE4461EF1E9D403F1'
-    execute "find '#{app_dir}' -name .DS_Store | xargs -I $ rm -f $"
+      execute "find '#{compiled_dir}' -name .DS_Store | xargs -I $ rm -f $"
 
-    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-update.sh')
-    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison.sh')
-    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
-    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
-    execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')
-    execute "find '#{app_dir}' -name *.dylib | xargs -I $ codesign -f -v -s '#{sig}' $"
-    execute "find '#{app_dir}' -name *.so | xargs -I $ codesign -f -v -s '#{sig}' $"
-    execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.tmp')
-    execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.TOC')
-    execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
+      if arch == 'osx'
+        execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
+        execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
+
+        # modify version string in Info.plist
+        info_plist_path = File.join(app_dir, 'Contents', 'Info.plist')
+        execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), info_plist_path
+        execute 'sed', '-i', '', '-e', "s|APP_VERSION|#{app_version}|g", info_plist_path
+
+        # copy osx app icon
+        execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Icon.icns'), resources_dir
+        execute 'rm', '-f', File.join(resources_dir, 'nw.icns')
+
+        # codesign
+        sig = 'C8A9B7D71AF2234D0542582FE4461EF1E9D403F1'
+        execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-update.sh')
+        execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison.sh')
+        execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'nitrous-unison')
+        execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'programs', 'seticon')
+        execute 'codesign', '-f', '-v', '-s', sig, File.join(compiled_dir, 'node_modules', 'fsevents', 'build', 'Release', 'fswatch.node')
+        execute "find '#{app_dir}' -name *.dylib | xargs -I $ codesign -f -v -s '#{sig}' $"
+        execute "find '#{app_dir}' -name *.so | xargs -I $ codesign -f -v -s '#{sig}' $"
+        execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.tmp')
+        execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.TOC')
+        execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
+      end
+    end
   end
 end
 
