@@ -1,6 +1,7 @@
 gui = require 'nw.gui'
 win = gui.Window.get()
 appPath = require 'app-path'
+childProcess = require 'child_process'
 path = require 'path'
 fs = require 'fs'
 os = require 'os'
@@ -41,6 +42,8 @@ App.TrayMenuView = Em.View.extend
         fs.mkdir nitrousFolderPath, (err) ->
           hiddenFilePath = path.join nitrousFolderPath, '.nitrous.io'
           fs.appendFile hiddenFilePath, '', (err) ->
+            if os.type() == 'Windows_NT'
+              childProcess.execFile 'attrib.exe', ['+h', hiddenFilePath]
             gui.Shell.showItemInFolder hiddenFilePath
       App.mixpanel?.track 'Opened Folder'
 
