@@ -5,8 +5,6 @@ path = require 'path'
 fs = require 'fs'
 os = require 'os'
 
-IMAGE_EXTENSION = if os.type() == 'Darwin' then 'tiff' else 'png'
-
 App.TrayMenuView = Em.View.extend
   elementId: 'tray-menu-view'
   tray: null
@@ -89,11 +87,18 @@ App.TrayMenuView = Em.View.extend
   show: ->
     @hide() if @get 'tray'
 
-    trayIconPath = path.join(appPath, 'resources', 'images', "status-item-icon.#{IMAGE_EXTENSION}")
-    trayAltIconPath = path.join(appPath, 'resources', 'images', "status-item-icon-highlighted.#{IMAGE_EXTENSION}")
+    if os.type() == 'Darwin'
+      trayIconPath = path.join(appPath, 'resources', 'images', 'status-item-icon.tiff')
+      trayAltIconPath = path.join(appPath, 'resources', 'images', 'status-item-icon-highlighted.tiff')
+    else if os.type() == 'Windows_NT'
+      trayIconPath = path.join(appPath, 'resources', 'images', 'tray-icon.png')
+      trayAltIconPath = path.join(appPath, 'resources', 'images', 'tray-icon.png')
 
     @set 'tray', tray = new gui.Tray(icon: trayIconPath, alticon: trayAltIconPath)
     tray.menu = @get('mainMenu')
+
+    if os.type() != 'Darwin'
+      tray.on 'click', @get('openWindowMenuItem').click
 
   hide: ->
     if tray = @get 'tray'
@@ -113,14 +118,22 @@ App.TrayMenuView = Em.View.extend
 
   _changeTrayImage: (->
     if tray = @get 'tray'
-      if App.get 'online'
-        if App.get('syncCount') > 0
-          tray.icon = path.join(appPath, 'resources', 'images', "status-item-icon-syncing.#{IMAGE_EXTENSION}")
-          tray.alticon = path.join(appPath, 'resources', 'images', "status-item-icon-syncing-highlighted.#{IMAGE_EXTENSION}")
+      if os.type() == 'Darwin'
+        if App.get 'online'
+          if App.get('syncCount') > 0
+            tray.icon = path.join(appPath, 'resources', 'images', 'status-item-icon-syncing.tiff')
+            tray.alticon = path.join(appPath, 'resources', 'images', 'status-item-icon-syncing-highlighted.tiff')
+          else
+            tray.icon = path.join(appPath, 'resources', 'images', 'status-item-icon.tiff')
+            tray.alticon = path.join(appPath, 'resources', 'images', 'status-item-icon-highlighted.tiff')
         else
-          tray.icon = path.join(appPath, 'resources', 'images', "status-item-icon.#{IMAGE_EXTENSION}")
-          tray.alticon = path.join(appPath, 'resources', 'images', "status-item-icon-highlighted.#{IMAGE_EXTENSION}")
-      else
-        tray.icon = path.join(appPath, 'resources', 'images', "status-item-icon-gray.#{IMAGE_EXTENSION}")
-        tray.alticon = path.join(appPath, 'resources', 'images', "status-item-icon-gray-highlighted.#{IMAGE_EXTENSION}")
+          tray.icon = path.join(appPath, 'resources', 'images', 'status-item-icon-gray.tiff')
+          tray.alticon = path.join(appPath, 'resources', 'images', 'status-item-icon-gray-highlighted.tiff')
+      else if os.type() == 'Windows_NT'
+        if App.get('syncCount') > 0
+          tray.icon = path.join(appPath, 'resources', 'images', 'tray-icon-syncing.png')
+          tray.alticon = path.join(appPath, 'resources', 'images', 'tray-icon-syncing.png')
+        else
+          tray.icon = path.join(appPath, 'resources', 'images', 'tray-icon.png')
+          tray.alticon = path.join(appPath, 'resources', 'images', 'tray-icon.png')
   ).observes 'App.online', 'App.syncCount'
