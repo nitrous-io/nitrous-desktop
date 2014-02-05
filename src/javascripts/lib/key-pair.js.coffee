@@ -4,6 +4,8 @@ fs = require 'fs'
 os = require 'os'
 path = require 'path'
 
+TRUE_HOME_PATH = process.env.HOME || process.env.USERPROFILE
+
 SSH_KEYGEN_BIN_PATH = path.join(appPath, 'programs',
   "nitrous-ssh-keygen#{if os.type() == 'Windows_NT' then '.exe' else ''}")
 
@@ -46,15 +48,22 @@ App.KeyPair = Em.Object.extend
 
   generate: (cb) ->
     @reset()
-    App.utility.findHomeFolder (home) ->
-      privateKeyPath = path.join(home, '.ssh', 'id_rsa')
-      publicKeyPath = privateKeyPath + '.pub'
+    sshPath = path.join(TRUE_HOME_PATH, '.ssh')
+    privateKeyPath = path.join(sshPath, 'id_rsa')
+    publicKeyPath = privateKeyPath + '.pub'
+    fs.mkdir sshPath, '0755', (err) ->
+      # hide .ssh folder in windows
+      if os.type() == 'Windows_NT'
+        childProcess.execFile 'attrib.exe', ['+h', sshPath]
+
       fs.rename privateKeyPath, privateKeyPath + '.previous', (err) ->
         fs.rename publicKeyPath, publicKeyPath + '.previous', (err) ->
+          passphrase = if os.type() == 'Windows_NT' then "''" else '' # empty passphrase
+
           args = [
             '-b', '2048' # bits
             '-t', 'rsa'  # type
-            '-N', ''     # passphrase: none
+            '-N', passphrase
             '-C', "nitrous-desktop@#{os.hostname().replace /\.local$/, ''}"  # name/comment
             '-f', privateKeyPath
           ]
@@ -64,26 +73,32 @@ App.KeyPair = Em.Object.extend
 
   _readKey: (keyName, cb) ->
     @reset()
-    App.utility.findHomeFolder (home) ->
-      privateKeyPath = path.join(home, '.ssh', keyName)
-      publicKeyPath = privateKeyPath + '.pub'
+    privateKeyPath = path.join(TRUE_HOME_PATH, '.ssh', keyName)
+    publicKeyPath = privateKeyPath + '.pub'
 
-      args = [
-        '-l' # parse and show fingerprint
-        '-f' # input file
-        privateKeyPath
-      ]
+    args = [
+      '-l' # parse and show fingerprint
+      '-f' # input file
+      privateKeyPath
+    ]
 
-      childProcess.execFile SSH_KEYGEN_BIN_PATH, args, {}, (err, stdout, stderr) ->
+    childProcess.execFile SSH_KEYGEN_BIN_PATH, args, {}, (err, stdout, stderr) ->
+      return cb?(err) if err
+      fs.readFile publicKeyPath, encoding: 'utf8', (err, publicKey) ->
         return cb?(err) if err
-        fs.readFile publicKeyPath, encoding: 'utf8', (err, publicKey) ->
-          return cb?(err) if err
-          keyData = stdout.match /^(\d+)\s+([0-9a-f:]+)\s+([^\s]+)\s+\(([^\)]+)\)$/m
-          cb? null,
-            privateKeyPath: privateKeyPath
-            publicKeyPath: publicKeyPath
-            publicKey: publicKey
-            bits: keyData[1]
-            fingerprint: keyData[2]
-            name: keyData[3]
-            type: keyData[4]
+        data =
+          privateKeyPath: privateKeyPath
+          publicKeyPath: publicKeyPath
+          publicKey: publicKey
+
+        if os.type() == 'Windows_NT'
+          parsed = stdout.match /^(\d+)\s+([0-9a-f:]+)/m
+        else
+          parsed = stdout.match /^(\d+)\s+([0-9a-f:]+)\s+([^\s]+)\s+\(([^\)]+)\)$/m
+          data.name = parsed[3]
+          data.type = parsed[4]
+
+        data.bits = parsed[1]
+        data.fingerprint = parsed[2]
+
+        cb? null, data

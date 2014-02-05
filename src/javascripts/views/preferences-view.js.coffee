@@ -5,8 +5,11 @@ App.PreferencesView = Em.View.extend
   privateKeyHint: (->
     bits = @get 'controller.keyPair.bits'
     type = @get 'controller.keyPair.type'
-    if bits && type
-      "#{bits}-bit #{type} Key"
+    if bits
+      hint = "#{bits}-bit"
+      if type
+        hint += " #{type} Key"
+      hint
   ).property 'controller.keyPair.bits', 'controller.keyPair.type'
 
   downloadProgress: (->
