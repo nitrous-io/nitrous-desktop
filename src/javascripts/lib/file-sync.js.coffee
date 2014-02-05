@@ -5,10 +5,13 @@ fs = require 'fs'
 os = require 'os'
 path = require 'path'
 
+TRUE_HOME_PATH = process.env.HOME || process.env.USERPROFILE
+
 IGNORE_LIST = 'Name {.unison,.git,.svn,.hg,CVS,.DS_Store,.AppleDouble,.LSOverride,.Spotlight-V100,.Trashes,*.sock,*.pid,*.sw?,._*,*~}'
-SETICON_BIN_PATH = path.join(appPath, 'programs', 'seticon')
-UNISON_SCRIPT_PATH = path.join(appPath, 'programs',
-  "nitrous-unison#{if os.type() == 'Windows_NT' then '.bat' else '.sh'}")
+PROGRAMS_PATH = path.join(appPath, 'programs')
+SETICON_BIN_PATH = path.join(PROGRAMS_PATH, 'seticon')
+UNISON_SH_PATH   = path.join(PROGRAMS_PATH, 'nitrous-unison.sh')
+UNISON_EXE_PATH  = path.join(PROGRAMS_PATH, 'nitrous-unison.exe')
 
 FOLDER_ICON_PATH = if os.type() == 'Darwin'
   path.join(appPath, 'resources', 'images', 'NitrousFolderIcon.icns')
@@ -17,7 +20,7 @@ else
 
 RETRY_DELAY = 10000 # milliseconds
 
-homePath = null
+homeFolderPath = null
 nitrousPath = null
 
 makeKey = (boxId) ->
@@ -93,7 +96,7 @@ App.FileSync = klass = Em.Object.extend
         @_startWatching()
       else
         App.utility.findHomeFolder (home) =>
-          homePath = home
+          homeFolderPath = home
           nitrousPath = path.join home, 'Nitrous'
           @_startWatching()
     else
@@ -158,8 +161,13 @@ App.FileSync = klass = Em.Object.extend
         fs.exists localPath, (exists) =>
           remotePath = "#{box.get 'sshURI'}/workspace"
 
+          devNull = if os.type() == 'Windows_NT'
+            'NUL'
+          else
+            '/dev/null'
+
           sshArgs = [
-            '-o UserKnownHostsFile=/dev/null'       # ignore known hosts
+            "-o UserKnownHostsFile=#{devNull}"      # ignore known hosts
             '-o StrictHostKeyChecking=no'           # no host key checking
             '-o PreferredAuthentications=publickey' # pub key authentication only
             '-c blowfish-cbc'                       # use blowfish cipher
@@ -167,7 +175,6 @@ App.FileSync = klass = Em.Object.extend
           ]
 
           args = [
-            UNISON_SCRIPT_PATH
             localPath
             remotePath
             '-ui', 'text'
@@ -185,10 +192,17 @@ App.FileSync = klass = Em.Object.extend
           ]
 
           # place archives file in localPath/.unison
-          env = _.defaults UNISON: path.join(localPath, '.unison'), process.env
+          unisonArchivesPath = path.join(localPath, '.unison')
+          env = _.defaults(
+            UNISON: unisonArchivesPath
+          , process.env)
+
+          if os.type() == 'Windows_NT'
+            env.HOME = TRUE_HOME_PATH
+            env.Path = PROGRAMS_PATH + ';' + process.env.Path
 
           options =
-            cwd: homePath
+            cwd: homeFolderPath
             detached: false
             env: env
 
@@ -201,7 +215,16 @@ App.FileSync = klass = Em.Object.extend
             args.push '-ignorelocks'
 
           console.log 'File Sync: syncing...'
-          @set 'process', proc = childProcess.spawn '/bin/bash', args, options
+
+          if os.type() == 'Windows_NT'
+            fs.mkdir unisonArchivesPath, '0755', (err) ->
+              childProcess.execFile 'attrib.exe', ['+h', unisonArchivesPath]
+            proc = childProcess.spawn UNISON_EXE_PATH, args, options
+          else
+            args.unshift UNISON_SH_PATH
+            proc = childProcess.spawn '/bin/bash', args, options
+
+          @set 'process', proc
           proc.stdout.on 'data', (data) => @_processOutput(data)
           proc.stderr.on 'data', (data) => @_processOutput(data)
           proc.on 'exit', (code) => @_processDidExit(code, cb)
