@@ -193,16 +193,15 @@ App.FileSync = klass = Em.Object.extend
 
           # place archives file in localPath/.unison
           unisonArchivesPath = path.join(localPath, '.unison')
-          env = _.defaults(
-            UNISON: unisonArchivesPath
-          , process.env)
+          env = _.clone(process.env)
+          env.UNISON = unisonArchivesPath
 
           if os.type() == 'Windows_NT'
             env.HOME = TRUE_HOME_PATH
             env.Path = PROGRAMS_PATH + ';' + process.env.Path
 
           options =
-            cwd: homeFolderPath
+            cwd: TRUE_HOME_PATH
             detached: false
             env: env
 

@@ -6,6 +6,8 @@ console = window.console
 os = require 'os'
 path = require 'path'
 
+TRUE_HOME_PATH = process.env.HOME || process.env.USERPROFILE
+
 SSH_BIN_PATH = path.join(appPath, 'programs',
   "nitrous-ssh#{if os.type() == 'Windows_NT' then '.exe' else ''}")
 
@@ -126,8 +128,16 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
       "action@#{box.get 'host'}"
     ]
 
+
+    env = _.clone(process.env)
+
+    if os.type() == 'Windows_NT'
+      env.HOME = TRUE_HOME_PATH
+
     options =
+      cwd: TRUE_HOME_PATH
       detached: false
+      env: env
 
     @get('forwardedPorts').forEach (port) ->
       args = args.concat ['-L', "#{port}/localhost/#{port}"]
@@ -184,7 +194,6 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
         @set 'lastErrorMessage', 'Authentication failed'
       else if match = (data.indexOf(': Could not resolve hostname') != -1 ||
                        data.indexOf(': Operation timed out')        != -1 ||
-                       data.indexOf(': Connection refused')         != -1 ||
                        data.indexOf(': Network is unreachable')     != -1 ||
                        data.indexOf('Host is down')                 != -1 ||
                        data.indexOf('Timeout, server')              != -1 ||
