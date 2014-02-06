@@ -147,20 +147,28 @@ task :build => [:clean, :compile] do
   app_version = config_json['app_version']
   %w(osx win).each do |arch|
     puts "=> Building #{@target} for #{arch}..."
-    compiled_dir = File.join BUILD_DIR, @target, arch
+    compiled_dir = File.join ROOT_DIR, BUILD_DIR, @target, arch
     target_dir = compiled_dir
-    FileUtils.mkpath compiled_dir
+    FileUtils.mkpath target_dir
 
-    if @target == 'production' && arch == 'osx'
-      node_webkit_app_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, 'osx', 'node-webkit.app')
-      execute 'cp', '-RP', node_webkit_app_dir, compiled_dir
-      app_dir = File.join(compiled_dir, 'Nitrous Desktop.app')
-      execute 'mv', File.join(compiled_dir, 'node-webkit.app'), app_dir
+    node_webkit_dir = File.join(ROOT_DIR, 'node-webkit', NODE_WEBKIT_VERSION, arch)
 
-      resources_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources')
-      compiled_dir = File.join(resources_dir, 'app.nw')
-      FileUtils.mkpath compiled_dir
+    if @target == 'production'
+      if arch == 'osx'
+        node_webkit_app_dir = File.join(node_webkit_dir, 'node-webkit.app')
+        execute 'cp', '-RP', node_webkit_app_dir, target_dir
+        app_dir = File.join(target_dir, 'Nitrous Desktop.app')
+        execute 'mv', File.join(target_dir, 'node-webkit.app'), app_dir
+
+        resources_dir = File.join(target_dir, 'Nitrous Desktop.app', 'Contents', 'Resources')
+        compiled_dir = File.join(resources_dir, 'app.nw')
+      elsif arch == 'win'
+        %w(nw.exe nw.pak icudt.dll libEGL.dll libGLESv2.dll).map { |f| File.join(node_webkit_dir, f) }.each { |f| execute 'cp', f, target_dir }
+        compiled_dir = File.join(target_dir, 'app')
+      end
     end
+
+    FileUtils.mkpath compiled_dir
 
     modules_dir = File.join(compiled_dir, 'node_modules')
     FileUtils.mkpath modules_dir
@@ -192,17 +200,11 @@ task :build => [:clean, :compile] do
     execute 'cp', '-RP', File.join(VENDOR_DIR, 'font-awesome', 'font'), compiled_dir
 
     if @target == 'production'
-      #filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
-      #system "cd #{compiled_dir}; zip -r ../'#{filename}'.zip *"
-
-      #puts "=> build/#{@target}/#{filename}.zip"
-
       execute "find '#{compiled_dir}' -name .DS_Store | xargs -I $ rm -f $"
+      execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
+      execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
 
       if arch == 'osx'
-        execute 'mv', File.join(target_dir, 'javascripts'), compiled_dir
-        execute 'mv', File.join(target_dir, 'stylesheets'), compiled_dir
-
         # modify version string in Info.plist
         info_plist_path = File.join(app_dir, 'Contents', 'Info.plist')
         execute 'cp', '-f', File.join(ROOT_DIR, SOURCE_DIR, 'Info.plist'), info_plist_path
@@ -224,6 +226,14 @@ task :build => [:clean, :compile] do
         execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.tmp')
         execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.TOC')
         execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
+      elsif arch == 'win'
+        filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
+        Dir.chdir compiled_dir do
+          execute 'zip', '-r', File.join(target_dir, 'app.nw'), '.'
+        end
+        execute 'rm', '-rf', compiled_dir
+
+        puts "=> build/#{@target}/#{filename}.zip"
       end
     end
   end
