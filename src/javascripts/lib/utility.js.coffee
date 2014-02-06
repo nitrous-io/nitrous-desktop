@@ -48,3 +48,9 @@ App.utility =
         path.join appPath, '..', '..', '..'
       else
         null # TODO
+
+  killAll: (procName, cb) ->
+    if os.type() == 'Windows_NT'
+      childProcess.execFile 'taskkill.exe', ['/IM', procName + '.exe', '/F'], {}, cb
+    else
+      childProcess.execFile '/usr/bin/killall', ['-9', procName], {}, cb

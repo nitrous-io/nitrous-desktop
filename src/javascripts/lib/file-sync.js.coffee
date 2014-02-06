@@ -298,6 +298,6 @@ klass.reopenClass
       klass._create box: box
 
   killAll: (cb) ->
-    childProcess.execFile '/usr/bin/killall', ['-9', 'nitrous-unison'], {}, cb
+    App.utility.killAll 'nitrous-unison', cb
 
 klass.killAll()

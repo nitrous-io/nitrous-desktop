@@ -146,10 +146,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
     @set 'process', proc = childProcess.spawn(SSH_BIN_PATH, args, options)
     proc.stdout.on 'data', (data) => @_processOutput(data)
     proc.stderr.on 'data', (data) => @_processOutput(data)
-    proc.on 'exit', (code) =>
-      console.log "Port Forwarding: process exited with code #{code}"
-      @set 'process', null
-      @set 'connected', false
+    proc.on 'exit', (code) => @_processDidExit(code)
 
   _stopPortForwarding: ->
     @set 'lastErrorMessage', null
@@ -200,8 +197,13 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
                        data.indexOf('Write failed: Broken pipe')    != -1)
         @set 'lastErrorMessage', 'Connection failed'
 
-      if match
-        @_scheduleRetry()
+      @_scheduleRetry() if match
+
+  _processDidExit: (code) ->
+    console.log "Port Forwarding: process exited with code #{code}"
+    @set 'process', null
+    @set 'connected', false
+    @_scheduleRetry() if @get 'enabled'
 
 klass._create = klass.create
 klass.create = undefined
@@ -219,6 +221,6 @@ klass.reopenClass
       klass._create box: box
 
   killAll: (cb) ->
-    childProcess.execFile '/usr/bin/killall', ['-9', 'nitrous-ssh'], {}, cb
+    App.utility.killAll 'nitrous-ssh', cb
 
 klass.killAll()
