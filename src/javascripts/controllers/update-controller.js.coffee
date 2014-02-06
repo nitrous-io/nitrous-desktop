@@ -31,6 +31,7 @@ App.UpdateController = klass = Em.Controller.extend
     , UPDATE_CHECK_INTERVAL)
 
   check: ->
+    return if os.type() == 'Windows_NT'
     unless @get 'checking'
       @set 'checkFailed', false
       @set 'updateFailed', false

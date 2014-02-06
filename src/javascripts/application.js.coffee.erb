@@ -10,6 +10,7 @@
 
 appURL = location.origin + location.pathname
 console = window.console
+os = require 'os'
 gui = require 'nw.gui'
 win = gui.Window.get()
 
@@ -30,6 +31,9 @@ window.NitrousDesktop = Em.Application.extend Ember.Evented,
   applicationView: null
   mixpanel: null
   syncCount: 0
+  platform:
+    isWindows: os.type() == 'Windows_NT'
+    isMac: os.type() == 'Darwin'
 
   reset: ->
     @setProperties

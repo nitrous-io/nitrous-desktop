@@ -26,19 +26,22 @@
   .info-row
     .left
     .right
-      unless controllers.update.updating
-        button.btn.btn-white click='checkForUpdate' disabled={ controllers.update.checking } Check For Update
-        if controllers.update.checkFailed
-          | Check failed
-        else
-          if controllers.update.updateFailed
-            | Update failed
+      if App.platform.isWindows
+        | Auto-update Disabled
       else
-        .update-progress
-          if controllers.update.downloading
-            | Downloading Update...
-            | &nbsp;
-            span {{ view.downloadProgress }}%
+        unless controllers.update.updating
+          button.btn.btn-white click='checkForUpdate' disabled={ controllers.update.checking } Check For Update
+          if controllers.update.checkFailed
+            | Check failed
+          else
+            if controllers.update.updateFailed
+              | Update failed
+        else
+          .update-progress
+            if controllers.update.downloading
+              | Downloading Update...
+              | &nbsp;
+              span {{ view.downloadProgress }}%
 
   .info-row
     .left
