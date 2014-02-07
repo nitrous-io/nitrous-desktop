@@ -228,6 +228,12 @@ task :build => [:clean, :compile] do
         execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
       elsif arch == 'win'
         filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
+
+        # copy unison out of programs folder and keep in under tools directory for license compliance
+        tools_dir = File.join(target_dir, 'tools')
+        FileUtils.mkpath tools_dir
+        execute 'mv', File.join(compiled_dir, 'programs', 'nitrous-unison.exe'), tools_dir
+
         Dir.chdir compiled_dir do
           execute 'zip', '-r', File.join(target_dir, 'app.nw'), '.'
         end

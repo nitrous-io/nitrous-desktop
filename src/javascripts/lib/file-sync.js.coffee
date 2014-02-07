@@ -13,6 +13,10 @@ SETICON_BIN_PATH = path.join(PROGRAMS_PATH, 'seticon')
 UNISON_SH_PATH   = path.join(PROGRAMS_PATH, 'nitrous-unison.sh')
 UNISON_EXE_PATH  = path.join(PROGRAMS_PATH, 'nitrous-unison.exe')
 
+# windows production bundles have unison executable outside project dir for license compliance
+if App.platform.isWindows && !fs.existsSync(UNISON_EXE_PATH)
+  UNISON_EXE_PATH = path.join(process.execPath, '..', 'tools', 'nitrous-unison.exe')
+
 FOLDER_ICON_PATH = if os.type() == 'Darwin'
   path.join(appPath, 'resources', 'images', 'NitrousFolderIcon.icns')
 else
