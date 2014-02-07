@@ -8,6 +8,7 @@
   , "width": 320
   , "height": 480
   , "title": "Nitrous Desktop"
+  , "icon": "resources/images/tray-icon.png"
   }
 , "user-agent": "NitrousDesktop/%ver (%osinfo) node-webkit/%nwver webkit/%webkit_ver"
 , "dependencies": {
