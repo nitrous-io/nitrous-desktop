@@ -87,5 +87,4 @@ div class={ :stack-image boxTemplate.runtime }
         .left
         .right
           button.btn.btn-white click='ide' IDE
-          button.btn.btn-white click='terminal' Terminal
-          button.btn.btn-white click='ssh' SSH
+          button.btn.btn-white click='shell' Shell

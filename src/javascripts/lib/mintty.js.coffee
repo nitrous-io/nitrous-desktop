@@ -12,13 +12,15 @@ MINTTY_BIN_PATH = path.join(appPath, 'programs', 'mintty.exe')
 unless fs.existsSync(MINTTY_BIN_PATH)
   MINTTY_BIN_PATH = path.join(process.execPath, '..', 'tools', 'mintty.exe')
 
+SSH_ICON_PATH = path.join(appPath, 'resources', 'images', 'ssh-icon.ico')
+
 App.mintty =
   ssh: (user, host, port, title) ->
     args = [
-      '--hold', 'always'
-      '--option', 'Term=xterm-256color'
       '--option', 'Locale=en_US'
       '--option', 'Charset=UTF-8'
+      '--option', 'Term=xterm-256color'
+      '--icon', SSH_ICON_PATH
       '--exec', SSH_BIN_PATH
       '-o', 'UserKnownHostsFile=NUL'
       '-o', 'StrictHostKeyChecking=no'
@@ -39,7 +41,6 @@ App.mintty =
 
     options =
       cwd: TRUE_HOME_PATH
-      detached: true
       env: env
 
     childProcess.execFile MINTTY_BIN_PATH, args, options

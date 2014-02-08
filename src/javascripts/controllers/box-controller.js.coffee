@@ -37,14 +37,7 @@ App.BoxController = Em.ObjectController.extend
       App.mixpanel?.track 'Opened Web IDE', box_id: boxId
       false
 
-    terminal: ->
-      box = @get 'content'
-      boxId = box.get 'id'
-      App.utility.openWebsitePath "/app#/boxes/#{boxId}/terminal"
-      App.mixpanel?.track 'Opened Web Terminal', box_id: boxId
-      false
-
-    ssh: ->
+    shell: ->
       box = @get 'content'
       host = @get 'host'
       port = @get 'port'
