@@ -164,6 +164,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 This app bundles a copy of Unison as a separate binary, which is distributed under the GNU Public License v3. The license can be found at http://www.gnu.org/licenses/gpl.txt, and the source code for Unison can be downloaded at https://github.com/nitrous-io/unison
 
+This app bundles a copy of Mintty as a separate binary, which is distributed under the GNU Public License v3. The license can be found at http://www.gnu.org/licenses/gpl.txt, and the source code for Mintty can be downloaded at http://nitrous-desktop.s3.amazonaws.com/mintty-1.0.3-src.tar.bz2
+
 This app uses OpenSSH, which is distributed under the following license:
 
 The licences which components of this software fall under are as

@@ -46,7 +46,13 @@ App.BoxController = Em.ObjectController.extend
 
     ssh: ->
       box = @get 'content'
-      gui.Shell.openExternal "ssh://action@#{@get 'host'}:#{@get 'port'}"
+      host = @get 'host'
+      port = @get 'port'
+      if App.platform.isWindows
+        App.mintty.ssh 'action', host, port, "#{box.get('name')} | Nitrous Desktop"
+      else
+        gui.Shell.openExternal "ssh://action@#{host}:#{port}"
+
       App.mixpanel?.track 'Opened Shell', box_id: box.get('id')
       false
 
