@@ -1,6 +1,5 @@
 gui = require 'nw.gui'
 win = gui.Window.get()
-screen = window.screen
 
 App.SignInRoute = Em.Route.extend
   model: ->
@@ -8,7 +7,7 @@ App.SignInRoute = Em.Route.extend
 
   activate: ->
     win.hide()
-    App.windowHelper.resizeAndMoveToCenter(320 + screen.availLeft, 480 + screen.availTop)
+    App.windowHelper.resizeAndMoveToCenter(320, 480)
     win.setResizable false
     win.setAlwaysOnTop(true)
     win.show()
