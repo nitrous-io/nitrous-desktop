@@ -7,7 +7,8 @@ os = require 'os'
 path = require 'path'
 url = require 'url'
 
-APPCAST_URL = "#{App.get 'config.host'}/mac/appcast.xml"
+APPCAST_URL = "#{App.get 'config.host'}/desktop_apps/#{if App.platform.isWindows then 'windows' else 'mac'}/appcast.xml"
+
 UPDATE_SCRIPT_PATH = path.join(appPath, 'programs',
   "nitrous-update.#{if os.type() == 'Windows_NT' then 'bat' else 'sh'}")
 UPDATE_CHECK_INTERVAL = 6 * 60 * 60 * 1000  # 6 hours
@@ -31,7 +32,6 @@ App.UpdateController = klass = Em.Controller.extend
     , UPDATE_CHECK_INTERVAL)
 
   check: ->
-    return if os.type() == 'Windows_NT'
     unless @get 'checking'
       @set 'checkFailed', false
       @set 'updateFailed', false
@@ -160,8 +160,6 @@ App.UpdateController = klass = Em.Controller.extend
       @set 'updating', false
       return
 
-    # TODO windows
-
     executablePath = App.utility.executablePath()
     installPath = path.join executablePath, '..'
 
@@ -176,7 +174,6 @@ App.UpdateController = klass = Em.Controller.extend
       fs.unlink(writeTestFilePath)
 
       args = [
-        UPDATE_SCRIPT_PATH
         process.pid
         executablePath
         downloadPath
@@ -187,7 +184,14 @@ App.UpdateController = klass = Em.Controller.extend
         detached: true
 
       console.log args
-      childProcess.spawn '/bin/bash', args, options
+      if App.platform.isWindows
+        update_script_in_temp_path = path.join process.env.TEMP, 'nitrous-update.bat'
+        fs.writeFileSync(update_script_in_temp_path, fs.readFileSync(UPDATE_SCRIPT_PATH))
+        args.unshift '/c', 'start', 'Updating Nitrous Desktop...', '/min', update_script_in_temp_path
+        childProcess.spawn 'cmd.exe', args, options
+      else
+        args.unshift UPDATE_SCRIPT_PATH
+        childProcess.spawn '/bin/bash', args, options
 
       Em.run.next ->
         App.quit()

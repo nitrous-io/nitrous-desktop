@@ -227,22 +227,22 @@ task :build => [:clean, :compile] do
         execute 'rm', '-f', File.join(app_dir, 'Contents', 'Frameworks', 'node-webkit Framework.framework', 'node-webkit Framework.TOC')
         execute 'codesign', '-f', '--deep', '-v', '-s', sig, app_dir
       elsif arch == 'win'
-        filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
+        # filename = "NitrousDesktop-#{@target}-#{config_json['app_version']}"
 
         # keep some vendored apps outside app bundle for license compliance
         tools_dir = File.join(target_dir, 'tools')
         FileUtils.mkpath tools_dir
         execute 'mv', File.join(compiled_dir, 'programs', 'nitrous-unison.exe'), tools_dir
         execute 'cp', File.join(compiled_dir, 'programs', 'mintty.exe'), tools_dir
+        execute 'cp', File.join(compiled_dir, 'programs', 'unzip.exe'), tools_dir
         execute 'cp', File.join(compiled_dir, 'programs', 'msys-1.0.dll'), tools_dir
 
         Dir.chdir compiled_dir do
           execute 'zip', '-r', File.join(target_dir, 'app.nw'), '.'
         end
         execute 'rm', '-rf', compiled_dir
-
-        puts "=> build/#{@target}/#{filename}.zip"
       end
+      puts "=> Great Success!"
     end
   end
 end

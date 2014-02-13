@@ -43,11 +43,10 @@ App.utility =
         ])
 
   executablePath: ->
-    switch os.type()
-      when 'Darwin'
-        path.join appPath, '..', '..', '..'
-      else
-        null # TODO
+    if App.platform.isWindows
+      path.join process.execPath, '..'
+    else
+      path.join appPath, '..', '..', '..'
 
   killAll: (procName, cb) ->
     if os.type() == 'Windows_NT'
