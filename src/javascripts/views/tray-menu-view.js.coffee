@@ -15,7 +15,6 @@ App.TrayMenuView = Em.View.extend
   openWebMenuItem: null
   preferencesMenuItem: null
   helpMenuItem: null
-  signOutMenuItem: null
   quitMenuItem: null
 
   init: ->
@@ -28,7 +27,6 @@ App.TrayMenuView = Em.View.extend
       openWebMenuItem:     openWebMenuItem     = new gui.MenuItem(label: 'Open Nitrous.IO Website...')
       preferencesMenuItem: preferencesMenuItem = new gui.MenuItem(label: 'Preferences...')
       helpMenuItem:        helpMenuItem        = new gui.MenuItem(label: 'Help')
-      signOutMenuItem:     signOutMenuItem     = new gui.MenuItem(label: 'Sign Out')
       quitMenuItem:        quitMenuItem        = new gui.MenuItem(label: 'Quit Nitrous Desktop')
 
     openWindowMenuItem.click = ->
@@ -60,9 +58,6 @@ App.TrayMenuView = Em.View.extend
     helpMenuItem.click = ->
       gui.Shell.openExternal 'http://help.nitrous.io/nitrous-desktop/'
 
-    signOutMenuItem.click = ->
-      App.trigger 'SignOut'
-
     quitMenuItem.click = ->
       App.quit()
 
@@ -76,8 +71,6 @@ App.TrayMenuView = Em.View.extend
     mainMenu.append(preferencesMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(helpMenuItem)
-    mainMenu.append(new gui.MenuItem type: 'separator')
-    mainMenu.append(signOutMenuItem)
     mainMenu.append(new gui.MenuItem type: 'separator')
     mainMenu.append(quitMenuItem)
 
@@ -116,7 +109,6 @@ App.TrayMenuView = Em.View.extend
     @get('openFolderMenuItem')?.enabled = userSignedIn
     @get('openWebMenuItem')?.enabled = userSignedIn && online
     @get('preferencesMenuItem')?.enabled = userSignedIn
-    @get('signOutMenuItem')?.enabled = userSignedIn
   ).observes 'App.userSignedIn', 'App.online'
 
   _changeTrayImage: (->
