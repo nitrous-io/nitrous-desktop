@@ -1,6 +1,8 @@
 gui = require 'nw.gui'
 
 App.SignInController = Em.ObjectController.extend
+  errorPopupVisible: false
+  errorMessage: null
   invalidCredentials: false
 
   signInButtonDisabled: (->
@@ -21,7 +23,11 @@ App.SignInController = Em.ObjectController.extend
         if jqXHR.status == 401
           @set 'invalidCredentials', true
         else
-          window.alert errorMessage ? 'Unable to connect to Nitrous.IO, please try again later.'
+          @set 'errorMessage', errorMessage || 'Unable to connect to Nitrous.IO, please try again later.'
+          @set 'errorPopupVisible', true
+          Em.run.later(=>
+            @set 'errorPopupVisible', false
+          , 5000)
 
         @set 'isSaving', false
       false
@@ -32,4 +38,8 @@ App.SignInController = Em.ObjectController.extend
 
     signUp: ->
       gui.Shell.openExternal App.get('config.host')
+      false
+
+    dismissErrorPopup: ->
+      @set 'errorPopupVisible', false
       false

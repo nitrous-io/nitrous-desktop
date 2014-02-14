@@ -17,3 +17,7 @@ form submit='signIn'
   button.btn-link click='forgotPassword' Forgot your password?
   .pull-right
     button.btn-link click='signUp' Not a user? Sign up
+
+.error-popup class={ errorPopupVisible:visible } click='dismissErrorPopup'
+  p
+    = errorMessage
