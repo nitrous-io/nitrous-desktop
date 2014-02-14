@@ -91,14 +91,10 @@ App.KeyPair = Em.Object.extend
           publicKeyPath: publicKeyPath
           publicKey: publicKey
 
-        if os.type() == 'Windows_NT'
-          parsed = stdout.match /^(\d+)\s+([0-9a-f:]+)/m
-        else
-          parsed = stdout.match /^(\d+)\s+([0-9a-f:]+)\s+([^\s]+)\s+\(([^\)]+)\)$/m
+        if parsed = stdout.match(/^(\d+)\s+([0-9a-f:]+)\s+(.+)\s+\(([^\)]+)\)$/m) || stdout.match(/^(\d+)\s+([0-9a-f:]+)/m)
+          data.bits = parsed[1]
+          data.fingerprint = parsed[2]
           data.name = parsed[3]
           data.type = parsed[4]
-
-        data.bits = parsed[1]
-        data.fingerprint = parsed[2]
 
         cb? null, data
