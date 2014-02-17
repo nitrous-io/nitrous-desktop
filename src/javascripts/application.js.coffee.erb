@@ -81,6 +81,8 @@ $(window).on 'offline', ->
 
 $html = $('html')
 
+$html.addClass(if App.platform.isWindows then 'windows' else 'osx')
+
 win.on 'focus', ->
   $html.removeClass 'blurred'
 

@@ -1,7 +1,6 @@
 //= require bootstrap3/css/bootstrap
 //= require font-awesome/css/font-awesome
 //= require_self
-//= require osx
 //= require_tree ./components
 //= require_tree ./views
 
@@ -19,6 +18,17 @@ html, body, #app, #application-view
 html
   border-top: 1px solid #6a6a6a
   overflow: hidden
+
+html, body
+  background: #ededed
+
+body,
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6
+  font-family: "Lucida Grande", "Helvetica Neue", Helvetica, sans-serif
+
+code, pre
+  font-family: Menlo, Monaco, monospace
 
 html.blurred
   border-top: 1px solid #a8a8a8
@@ -59,9 +69,35 @@ div,
 .no-mouse
   pointer-events: none
 
+.native
+  font-size: 13px
+  line-height: normal
+  padding-left: 10px
+  padding-right: 10px
+
 #debug
   display: none
   position: fixed
   top: 0
   right: 0
   z-index: 99999
+
+html.windows
+  border-top: none
+
+  &, body
+    background: #f0f0f0
+
+  &.blurred
+    border-top: none
+
+  body,
+  h1, h2, h3, h4, h5, h6,
+  .h1, .h2, .h3, .h4, .h5, .h6
+    font-family: Tahoma, Arial, sans-serif
+
+  code, pre
+    font-family: 'Lucida Console', Consolas, monospace
+
+  .native
+    padding: 2px 10px 3px 10px

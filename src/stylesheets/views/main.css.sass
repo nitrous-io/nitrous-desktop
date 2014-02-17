@@ -35,9 +35,7 @@
           display: block
           width: 100%
           white-space: nowrap
-          padding-left: 18px
-          padding-top: 1px
-          padding-bottom: 1px
+          padding: 1px 0 1px 18px
           color: #000
           font-size: 12px
           overflow: hidden
@@ -60,7 +58,6 @@
               text-shadow: none
 
             .state-orb
-              border-color: white
               box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4)
 
           i
@@ -242,3 +239,121 @@ html.blurred
         background-image: linear-gradient(to bottom, #c8ccd2 0%, #afb4bc 100%)
         border-top: 1px solid #bcc0c6
         border-bottom: 1px solid #969aa2
+
+html.windows
+  #main-view
+    #sidebar
+      padding: 0 1px
+      border-right: 1px solid #f7f7f7
+      background-image: none
+      background-color: white
+
+      h3
+        padding: 10px 0 4px 10px
+        color: #5f5f5f
+        text-shadow: none
+        text-transform: none
+        font-size: 12px
+        font-weight: normal
+
+      .list ul li
+        padding: 2px 0 3px 15px
+        font-size: 12px
+
+        &.selected
+          padding-top: 1px
+          padding-bottom: 2px
+          padding-left: 14px
+          background-image: none
+          background-color: #cae8f7
+          border: 1px solid #199fdc
+          color: #000
+          text-shadow: none
+
+          .state-orb
+            box-shadow: none
+
+      .ui-reload
+        top: 8px
+        right: 10px
+
+    .btn-white, .btn-simple
+      border: 1px solid #acacac
+      border-radius: 0
+      background-image: linear-gradient(to bottom, #f0f0f0 0%, #e5e5e5 100%)
+      padding: 2px 12px 2px 12px
+      font-size: 11px
+      transition: border-color 1s, background-image 1s
+
+      &:focus
+        border: 1px solid #439ffb
+
+      &:hover
+        border: 1px solid #85b5e7
+        background-image: linear-gradient(to bottom, #edf4fb 0%, #deecfb 100%)
+
+      &:active
+        border: 1px solid #60a0e2
+        background-image: linear-gradient(to bottom, #deecfb 0%, #c7e0fa 100%)
+        box-shadow: none
+
+      &.disabled, &[disabled]
+        opacity: 0.4
+
+    .btn-simple
+      font-size: 11px
+      color: black
+      margin-right: 4px
+
+      i
+        display: none
+
+      span
+        display: inline
+
+    .editable-list-view
+      .editable-list-label
+        border: 1px solid #828790
+        border-bottom: none
+        padding: 1px 1px 0 1px
+
+      label
+        display: block
+        padding: 2px 0 2px 8px
+        color: black
+        background: #fcfcfc
+        border-bottom: 1px solid #e8f1fb
+
+      > ul
+        height: 60px
+        border: 1px solid #828790
+        border-top: none
+        padding: 1px
+        margin-bottom: 5px
+
+        > li
+          padding: 1px 1px 1px 7px
+          border-bottom: none
+
+          &.selected
+            background-color: #2a96ff
+
+  &.blurred
+    #main-view
+      #sidebar
+        background-image: none
+
+        h3
+          color: black
+
+        .list ul li.selected
+          background-image: none
+          background-color: #f7f7f7
+          border: 1px solid #dedede
+          color: #000
+          text-shadow: none
+
+      .editable-list-view
+        > ul > li.selected
+          background-color: #dbdbdb
+          color: black

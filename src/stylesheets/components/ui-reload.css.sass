@@ -21,3 +21,25 @@
 
   span
     display: none
+
+html.windows
+  .ui-reload
+    background: none
+    width: 17px
+    height: 17px
+    color: #333
+    border: 1px solid #353535
+    transition: color 1s, border-color 1s, background-color 1s
+
+    &:hover
+      border-color: #429ffb
+      background: #f4f9ff
+      color: #000
+
+    &.reloading, &.reloading:hover, &:disabled
+      border-color: #999
+      background: #f4f4f4
+      color: #888
+
+      .icon-spin
+        -webkit-animation-name: none !important
