@@ -79,7 +79,7 @@ App.PortForwarding = klass = Em.ArrayProxy.extend Em.SortableMixin,
   add: (input) ->
     list = @get 'content'
     port = window.parseInt input, 10
-    if port > 0 && port < 65536 && !list.findBy('content', port)
+    if port >= 1024 && port <= 65535 && !list.findBy('content', port)
       item = App.ForwardedPort.create port: port
       list.pushObject item
 
