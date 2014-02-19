@@ -25,14 +25,14 @@ App.MainRoute = Em.Route.extend
       App.Region.find()
       @controllerFor('preferences').set 'keyPair', App.KeyPair.create()
       controller.checkKeyPairRequirement =>
-        boxesListController = @controllerFor 'boxesList'
-        boxesListController.set 'model', boxes = App.Box.find()
-        boxes.one 'didLoad', ->
-          boxesListController.selectFirstItem()
         @controllerFor('publicKeysList').set 'model', publicKeys = App.PublicKey.find()
         publicKeys.one 'didLoad', =>
           controller.checkPublicKeyRequirement =>
             @controllerFor('update').beginPeriodicChecking()
+            boxesListController = @controllerFor 'boxesList'
+            boxesListController.set 'model', boxes = App.Box.find()
+            boxes.one 'didLoad', ->
+              boxesListController.selectFirstItem()
     , (jqXHR) =>
       Em.run.later(=>
         @loadModels(controller)

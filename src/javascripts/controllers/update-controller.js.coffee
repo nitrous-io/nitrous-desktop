@@ -66,13 +66,13 @@ App.UpdateController = klass = Em.Controller.extend
     if newVersion && newVersionURL && newVersionFileSize
       controller = this
       modalController = @get 'controllers.modal'
+      modalController.reset()
       modalController.setProperties
         textOne: "A new version of Nitrous Desktop is available!"
         textTwo: 'Download and install update?'
         textThree: "Nitrous Desktop #{newVersion} is now available (you have #{App.get 'config.appVersion'})."
         cancelButtonText: 'Not Now'
         okButtonText: 'Install Update'
-        onCancel: ->
         onOk: =>
           Em.run.next =>
             @transitionToRoute 'preferences'

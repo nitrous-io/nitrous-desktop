@@ -25,6 +25,7 @@ App.MainController = Em.Controller.extend
       if keyPair.get('exists')
         cb?()
       else
+        modalController.reset()
         modalController.setProperties
           textOne: 'Nitrous Desktop could not find an existing SSH key pair on this computer.'
           textTwo: 'Generate one and register it with Nitrous.IO?'
@@ -38,9 +39,8 @@ App.MainController = Em.Controller.extend
               controller.transitionToRoute 'preferences'
               preferencesController.generateKeyPair (err) ->
                 return if err
-                preferencesController.registerPublicKey()
-          afterDismiss: ->
-            cb?()
+                preferencesController.registerPublicKey ->
+                  cb?()
         Em.run.next ->
           modalController.show()
 
@@ -55,6 +55,7 @@ App.MainController = Em.Controller.extend
       if publicKeysListController.findBy 'md5Fingerprint', fingerprint
         cb?()
       else
+        modalController.reset()
         modalController.setProperties
           textOne: "This computer's SSH public key is not yet registered with Nitrous.IO."
           textTwo: 'Register it with Nitrous.IO?'

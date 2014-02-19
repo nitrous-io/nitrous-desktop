@@ -4,19 +4,28 @@ App.ModalController = Em.Controller.extend
   textOne: null
   textTwo: null
   textThree: null
-
   cancelButtonText: null
   okButtonText: null
+  onOk: null
+  onCancel: null
+  afterDismiss: null
+
+  reset: ->
+    @setProperties
+      textOne: null
+      textTwo: null
+      textThree: null
+      cancelButtonText: null
+      okButtonText: null
+      onOk: null
+      onCancel: null
+      afterDismiss: null
 
   show: ->
     @set 'active', true
 
   dismiss: ->
     @set 'active', false
-
-  onOk: null
-  onCancel: null
-  afterDismiss: null
 
   actions:
     ok: ->
