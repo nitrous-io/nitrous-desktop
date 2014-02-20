@@ -10,7 +10,7 @@ url = require 'url'
 APPCAST_URL = "#{App.get 'config.host'}/desktop_apps/#{if App.platform.isWindows then 'windows' else 'mac'}/appcast.xml"
 
 UPDATE_SCRIPT_PATH = path.join(appPath, 'programs',
-  "nitrous-update.#{if os.type() == 'Windows_NT' then 'bat' else 'sh'}")
+  "nitrous-update.#{if os.type() == 'Windows_NT' then 'cmd' else 'sh'}")
 UPDATE_CHECK_INTERVAL = 6 * 60 * 60 * 1000  # 6 hours
 
 App.UpdateController = klass = Em.Controller.extend
@@ -164,8 +164,8 @@ App.UpdateController = klass = Em.Controller.extend
     installPath = path.join executablePath, '..'
 
     writeTestFilePath = path.join installPath, '.nitrous-desktop-install'
-    fs.writeFile writeTestFilePath, '', (err) ->
-      if err
+    fs.writeFile writeTestFilePath, '', (err) =>
+      if App.platform.isMac && err
         console.log 'Update: Unable to write to install directory. Aborting.'
         @set 'updateFailed', true
         @set 'updating', false
@@ -185,7 +185,7 @@ App.UpdateController = klass = Em.Controller.extend
 
       console.log args
       if App.platform.isWindows
-        update_script_in_temp_path = path.join process.env.TEMP, 'nitrous-update.bat'
+        update_script_in_temp_path = path.join process.env.TEMP, 'nitrous-update.cmd'
         fs.writeFileSync(update_script_in_temp_path, fs.readFileSync(UPDATE_SCRIPT_PATH))
         args.unshift '/c', 'start', 'Updating Nitrous Desktop...', '/min', update_script_in_temp_path
         childProcess.spawn 'cmd.exe', args, options

@@ -8,8 +8,31 @@ set archive_path=%3
 set tmp_path=%TEMP%\nitrous-desktop-update
 set backup_path=%app_path%.previous
 
-:wait_for_app_termination
+pause
 
+REM ask for admin privilege - adapted from https://sites.google.com/site/eneerge/scripts/batchgotadmin
+cacls "%SYSTEMROOT%\system32\config\system"
+
+if '%ERRORLEVEL%' EQU '5' (
+  goto uac_prompt
+) else (
+  goto got_admin
+)
+
+:uac_prompt
+set run_cmd_path=%TEMP%\nitrous-update-run.cmd
+echo @"%~s0" %1 %2 %3 > %run_cmd_path%
+echo Set UAC = CreateObject^("Shell.Application"^) > "%TEMP%\nitrous-elevate.vbs"
+echo UAC.ShellExecute "%run_cmd_path%", "", "", "runas", 1 >> "%TEMP%\nitrous-elevate.vbs"
+"%TEMP%\nitrous-elevate.vbs"
+exit
+
+:got_admin
+pushd "%CD%"
+if exist "%TEMP%\nitrous-elevate.vbs" ( del "%TEMP%\nitrous-elevate.vbs" )
+cd /D "%~dp0"
+
+:wait_for_app_termination
 for /f "tokens=2 usebackq" %%A in (`tasklist /nh /fi "PID eq %process_id%" 2^>^&1`) do (
   if %%A==%process_id% (
     ping -n 2 127.0.0.1 > NUL
