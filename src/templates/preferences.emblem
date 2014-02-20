@@ -57,6 +57,7 @@
       p
         | {{ user.username }}
         if user.fullName
+          | &nbsp;
           | ({{ user.fullName}})
       button.btn.btn-white click='signOut' Sign Out
 

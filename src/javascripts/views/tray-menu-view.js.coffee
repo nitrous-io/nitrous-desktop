@@ -56,7 +56,11 @@ App.TrayMenuView = Em.View.extend
       App.mixpanel?.track 'Opened Preferences'
 
     helpMenuItem.click = ->
-      gui.Shell.openExternal 'http://help.nitrous.io/nitrous-desktop/'
+      helpUrl = if App.platform.isWindows
+        'http://help.nitrous.io/nitrous-desktop-win/'
+      else
+        'http://help.nitrous.io/nitrous-desktop/'
+      gui.Shell.openExternal helpUrl
 
     quitMenuItem.click = ->
       App.quit()

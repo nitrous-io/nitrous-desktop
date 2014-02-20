@@ -37,7 +37,8 @@ App.SignInController = Em.ObjectController.extend
       false
 
     signUp: ->
-      gui.Shell.openExternal "#{App.get('config.host')}?utm_source=nitrous.io&utm_campaign=nativeapp&utm_content=mac"
+      signUpUrl = "#{App.get('config.host')}?utm_source=nitrous.io&utm_campaign=nativeapp&utm_content=#{if App.platform.isWindows then 'windows' else 'mac'}"
+      gui.Shell.openExternal signUpUrl
       false
 
     dismissErrorPopup: ->
