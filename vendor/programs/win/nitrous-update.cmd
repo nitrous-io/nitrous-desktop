@@ -8,8 +8,6 @@ set archive_path=%3
 set tmp_path=%TEMP%\nitrous-desktop-update
 set backup_path=%app_path%.previous
 
-pause
-
 REM ask for admin privilege - adapted from https://sites.google.com/site/eneerge/scripts/batchgotadmin
 cacls "%SYSTEMROOT%\system32\config\system"
 
