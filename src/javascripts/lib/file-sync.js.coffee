@@ -235,17 +235,17 @@ App.FileSync = klass = Em.Object.extend
   _processOutput: (data) ->
     data = data.toString('utf8')
     console.log data
-    if errorMessage = data.match(/[Ee]rror:\s*(.+)$/m)?[1]
-      if errorMessage.indexOf('Warning: inconsistent state.') != -1 ||
+    if errorMessage = data.match(/[Ee]rror:\s*(.+)$/m)?[1]?.toLowerCase()
+      if errorMessage.indexOf('warning: inconsistent state.') != -1 ||
          errorMessage.indexOf('on-disk archives are not identical') != -1
         @set 'lastErrorMessage', 'Inconsistent state'
         @set 'shouldIgnoreArchives', true
         @set 'shouldRetryWithDelay', 500
-      else if errorMessage.indexOf('Warning: the archives are locked.') != -1
+      else if errorMessage.indexOf('warning: the archives are locked.') != -1
         @set 'lastErrorMessage', 'Archives are locked'
         @set 'shouldIgnoreLocks', true
         @set 'shouldRetryWithDelay', 500
-      else if errorMessage.indexOf('Lost connection with the server') != -1
+      else if errorMessage.indexOf('lost connection with the server') != -1
         @set 'lastErrorMessage', 'Connection failed'
         @set 'shouldRetryWithDelay', true
       else
